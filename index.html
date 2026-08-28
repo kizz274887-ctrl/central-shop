@@ -355,6 +355,10 @@ button:disabled{
   font-weight:1000;
 }
 
+.buy:active{
+  transform:scale(.92);
+}
+
 /* TRUST */
 
 .trust{
@@ -425,6 +429,10 @@ button:disabled{
   color:#fff;
   font-size:12px;
   font-weight:1000;
+}
+
+.confirm:active{
+  transform:scale(.97);
 }
 
 /* ORDER */
@@ -548,8 +556,16 @@ button:disabled{
   background:linear-gradient(135deg,#18d66b,#078d46);
 }
 
+.approve:active{
+  transform:scale(.94);
+}
+
 .reject{
   background:linear-gradient(135deg,#ff1744,#a80028);
+}
+
+.reject:active{
+  transform:scale(.94);
 }
 
 .refresh{
@@ -560,6 +576,10 @@ button:disabled{
   color:#fff;
   font-size:9px;
   font-weight:bold;
+}
+
+.refresh:active{
+  transform:scale(.92);
 }
 
 /* PROFILE */
@@ -584,6 +604,101 @@ button:disabled{
   text-align:center;
   color:#666;
   font-size:10px;
+}
+
+/* LOADING SPINNER */
+
+.loading-spinner{
+  display:inline-block;
+  width:28px;
+  height:28px;
+  border:3px solid rgba(255,255,255,.08);
+  border-top-color:#ff1744;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
+
+.loading-text{
+  margin-top:12px;
+  color:#888;
+  font-size:10px;
+}
+
+/* MODAL */
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:999;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.modal-box{
+  background:#1a1e2a;
+  border-radius:24px;
+  padding:30px 24px;
+  max-width:320px;
+  width:90%;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.1);
+  animation:modalIn .25s ease;
+}
+
+@keyframes modalIn{
+  from{
+    transform:scale(.85);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.modal-icon{
+  font-size:48px;
+  margin-bottom:8px;
+}
+
+.modal-title{
+  color:#fff;
+  font-size:18px;
+  font-weight:1000;
+  margin:8px 0 6px;
+}
+
+.modal-message{
+  color:#aaa;
+  font-size:13px;
+  margin:10px 0 18px;
+  line-height:1.5;
+}
+
+.modal-btn{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ff1744,#a9002c);
+  color:#fff;
+  font-size:12px;
+  font-weight:1000;
+}
+
+.modal-btn:active{
+  transform:scale(.96);
 }
 
 /* NAV */
@@ -616,6 +731,12 @@ button:disabled{
   color:#666;
   font-size:6px;
   font-weight:1000;
+  cursor:pointer;
+  transition:.12s;
+}
+
+.nav:active{
+  transform:scale(.88);
 }
 
 .nav-icon{
@@ -954,6 +1075,14 @@ button:disabled{
       Welcome to Central Shop
     </p>
 
+    <!-- Admin Access Button -->
+    <div id="adminAccess" style="margin-top:18px; display:none;">
+      <button class="confirm" onclick="openAdmin()"
+              style="background:linear-gradient(135deg,#ff1744,#a8002b);">
+        🛡️ Admin Panel
+      </button>
+    </div>
+
   </div>
 
 </div>
@@ -991,6 +1120,30 @@ button:disabled{
   <div id="adminOrdersList"></div>
 
 </div>
+
+</div>
+
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay">
+
+  <div class="modal-box">
+
+    <div class="modal-icon" id="modalIcon">✅</div>
+
+    <div class="modal-title" id="modalTitle">
+      Success!
+    </div>
+
+    <div class="modal-message" id="modalMessage">
+      Your order has been placed.
+    </div>
+
+    <button class="modal-btn" onclick="closeModal()">
+      OK
+    </button>
+
+  </div>
 
 </div>
 
@@ -1315,6 +1468,26 @@ async function apiPost(data){
 
 
 /* ================================
+ MODAL
+================================ */
+
+function showModal(icon, title, message){
+
+  document.getElementById("modalIcon").innerText = icon || "✅";
+  document.getElementById("modalTitle").innerText = title || "Success!";
+  document.getElementById("modalMessage").innerHTML = message || "";
+  document.getElementById("confirmModal").classList.add("show");
+
+}
+
+function closeModal(){
+
+  document.getElementById("confirmModal").classList.remove("show");
+
+}
+
+
+/* ================================
  CREATE ORDER
 ================================ */
 
@@ -1347,8 +1520,10 @@ async function submitOrder(){
 
   if(!product){
 
-    tg.showAlert(
-      "⚠️ Please select a product."
+    showModal(
+      "⚠️",
+      "Missing Product",
+      "Please select a product first."
     );
 
     return;
@@ -1357,8 +1532,10 @@ async function submitOrder(){
 
   if(!playerId){
 
-    tg.showAlert(
-      "⚠️ Please enter Player ID / Username."
+    showModal(
+      "⚠️",
+      "Missing Player ID",
+      "Please enter your Player ID / Username."
     );
 
     return;
@@ -1369,8 +1546,10 @@ async function submitOrder(){
 
   if(!user){
 
-    tg.showAlert(
-      "⚠️ Please open this shop from Telegram."
+    showModal(
+      "⚠️",
+      "Not Connected",
+      "Please open this shop from Telegram."
     );
 
     return;
@@ -1415,12 +1594,10 @@ async function submitOrder(){
 
     if(result.success){
 
-      tg.showAlert(
-        "✅ ORDER CREATED!\n\n"+
-        "📦 Order ID: "+
-        result.orderId+
-        "\n\n⏳ Status: PENDING\n\n"+
-        "👤 Please wait for admin confirmation."
+      showModal(
+        "✅",
+        "Order Created!",
+        "📦 Order ID: <b>"+escapeHTML(result.orderId)+"</b><br><br>⏳ Status: <b>PENDING</b><br><br>👤 Please wait for admin confirmation."
       );
 
       openPage("ordersPage");
@@ -1429,9 +1606,10 @@ async function submitOrder(){
 
     }else{
 
-      tg.showAlert(
-        "❌ ORDER FAILED\n\n"+
-        (result.error || "Unknown error")
+      showModal(
+        "❌",
+        "Order Failed",
+        escapeHTML(result.error || "Unknown error")
       );
 
     }
@@ -1440,9 +1618,10 @@ async function submitOrder(){
 
     console.error(error);
 
-    tg.showAlert(
-      "❌ CONNECTION ERROR\n\n"+
-      error.message
+    showModal(
+      "❌",
+      "Connection Error",
+      escapeHTML(error.message)
     );
 
   }finally{
@@ -1538,10 +1717,12 @@ async function loadMyOrders(){
       "ordersList"
     );
 
-  box.innerHTML=
-    `<div class="loading">
-       ⏳ Loading orders...
-     </div>`;
+  box.innerHTML=`
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">⏳ Loading orders...</div>
+    </div>
+  `;
 
   const id=getTelegramId();
 
@@ -1715,8 +1896,10 @@ function openAdmin(){
 
   if(!isAdmin()){
 
-    tg.showAlert(
-      "❌ Admin access denied."
+    showModal(
+      "❌",
+      "Access Denied",
+      "You are not authorized to access the Admin Panel."
     );
 
     return;
@@ -1739,10 +1922,12 @@ async function loadAdminOrders(){
       "adminOrdersList"
     );
 
-  box.innerHTML=
-    `<div class="loading">
-       ⏳ Loading all orders...
-     </div>`;
+  box.innerHTML=`
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">⏳ Loading all orders...</div>
+    </div>
+  `;
 
   try{
 
@@ -1937,8 +2122,10 @@ async function changeStatus(
 
   if(!isAdmin()){
 
-    tg.showAlert(
-      "❌ Admin only."
+    showModal(
+      "❌",
+      "Access Denied",
+      "Admin only."
     );
 
     return;
@@ -1971,28 +2158,32 @@ async function changeStatus(
 
     if(result.success){
 
-      tg.showAlert(
+      showModal(
+        newStatus==="SUCCESS" ? "✅" : "❌",
+        newStatus==="SUCCESS" ? "Order Approved!" : "Order Cancelled!",
         newStatus==="SUCCESS"
-          ? "✅ Order approved successfully."
-          : "❌ Order cancelled successfully."
+          ? "The order has been approved successfully."
+          : "The order has been cancelled successfully."
       );
 
       loadAdminOrders();
 
     }else{
 
-      tg.showAlert(
-        "❌ Update failed\n\n"+
-        (result.error || "Unknown error")
+      showModal(
+        "❌",
+        "Update Failed",
+        escapeHTML(result.error || "Unknown error")
       );
 
     }
 
   }catch(error){
 
-    tg.showAlert(
-      "❌ CONNECTION ERROR\n\n"+
-      error.message
+    showModal(
+      "❌",
+      "Connection Error",
+      escapeHTML(error.message)
     );
 
   }
@@ -2059,6 +2250,14 @@ function openProfile(){
 
   }
 
+  // Admin access button
+  const adminBtn = document.getElementById("adminAccess");
+  if(isAdmin()){
+    adminBtn.style.display = "block";
+  } else {
+    adminBtn.style.display = "none";
+  }
+
 }
 
 
@@ -2068,9 +2267,10 @@ function openProfile(){
 
 function comingSoon(name){
 
-  tg.showAlert(
-    name+
-    " is coming soon."
+  showModal(
+    "🚀",
+    "Coming Soon!",
+    escapeHTML(name) + " is coming soon. Stay tuned!"
   );
 
 }
@@ -2147,19 +2347,15 @@ setInterval(()=>{
 
 
 /* ================================
- ADMIN ACCESS
+ ADMIN ACCESS NOTE
 ================================ */
 
 /*
-  Admin panel ကို bottom nav မှာ
-  မပြထားပါဘူး။
-
-  Admin ID နဲ့ shop ကိုဖွင့်ပြီး
-  JavaScript console ကနေ
-  openAdmin() လုပ်နိုင်ပါတယ်။
-
-  လိုအပ်ရင် Admin button ကို
-  Profile ထဲမှာလည်း ထည့်နိုင်ပါတယ်။
+  Admin panel ကို Profile ထဲမှာ ဝင်လို့ရပါပြီ။
+  
+  Admin ID စာရင်းထဲမှာ ပါမှသာ မြင်ရမှာဖြစ်ပါတယ်။
+  
+  Admin ID: 8758413326
 */
 
 </script>
