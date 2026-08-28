@@ -2,1448 +2,3856 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
 <title>Central Shop</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  margin: 0;
-  padding: 0;
+
+/* =========================================================
+   CENTRAL SHOP V2
+   Modern Telegram Mini App
+========================================================= */
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
 }
 
-html {
-  scroll-behavior: smooth;
+html{
+  scroll-behavior:smooth;
 }
 
-body {
-  margin: 0;
-  padding-bottom: 95px;
-  background: #0a0c12;
-  color: #fff;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  overflow-x: hidden;
+body{
+  min-height:100vh;
+  padding-bottom:105px;
+  background:
+    radial-gradient(circle at top right,rgba(255,23,68,.12),transparent 30%),
+    radial-gradient(circle at bottom left,rgba(90,50,255,.08),transparent 30%),
+    #070910;
+  color:#fff;
+  font-family:Segoe UI,Arial,sans-serif;
+  overflow-x:hidden;
 }
 
-.app {
-  max-width: 680px;
-  margin: auto;
-  padding: 12px;
+button,
+input,
+select{
+  font-family:inherit;
 }
 
-/* ===== HEADER ===== */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  border-radius: 28px;
-  background: linear-gradient(135deg, rgba(255,23,68,0.25), rgba(10,12,18,0.95));
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-  margin-bottom: 14px;
-  backdrop-filter: blur(10px);
+button{
+  cursor:pointer;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.app{
+  width:100%;
+  max-width:720px;
+  margin:auto;
+  padding:12px;
 }
 
-.logo-icon {
-  font-size: 32px;
+/* =========================================================
+   IMPORTANT PAGE FIX
+========================================================= */
+
+.page{
+  display:none;
+  width:100%;
+  animation:pageIn .25s ease;
 }
 
-.logo-main {
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
+.page.active{
+  display:block;
 }
 
-.logo-main span {
-  color: #ff1744;
-  text-shadow: 0 0 20px rgba(255,23,68,0.4);
+@keyframes pageIn{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
-.logo-sub {
-  font-size: 7px;
-  color: #888;
-  letter-spacing: 2.5px;
-  margin-top: 3px;
+/* =========================================================
+   HOME HEADER
+========================================================= */
+
+.header{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  margin-bottom:14px;
+
+  border-radius:25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,23,68,.20),
+      rgba(15,17,27,.96)
+    );
+
+  border:1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.04);
+
+  backdrop-filter:blur(20px);
 }
 
-.user-mini {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-.user-mini img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2.5px solid #ff1744;
-  box-shadow: 0 0 20px rgba(255,23,68,0.3);
+.logo-icon{
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:15px;
+
+  background:
+    linear-gradient(135deg,#ff1744,#8d001f);
+
+  font-size:23px;
+
+  box-shadow:
+    0 0 30px rgba(255,23,68,.25);
 }
 
-/* ===== VIDEO HERO ===== */
-.hero-video {
-  position: relative;
-  border-radius: 28px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+.logo-main{
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing:-1px;
 }
 
-.hero-video video {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  display: block;
+.logo-main span{
+  color:#ff1744;
+  text-shadow:0 0 20px rgba(255,23,68,.5);
 }
 
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.75) 80%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 30px 24px;
+.logo-sub{
+  margin-top:3px;
+  font-size:7px;
+  letter-spacing:2.8px;
+  color:#777;
+  font-weight:700;
 }
 
-.hero-overlay .top-right {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  text-align: right;
+.user-mini{
+  width:50px;
+  height:50px;
+  padding:2px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#ff1744,#ffca28);
 }
 
-.hero-overlay .top-right .label {
-  font-size: 8px;
-  color: #999;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+.user-mini img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:50%;
+  background:#111;
+  border:2px solid #080a10;
 }
 
-.hero-overlay .top-right .highlight {
-  font-size: 10px;
-  color: #ff1744;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+/* =========================================================
+   CENTRAL CEE GIF HERO
+========================================================= */
+
+.hero-video{
+  position:relative;
+  height:310px;
+  margin-bottom:16px;
+  overflow:hidden;
+  border-radius:30px;
+
+  background:
+    radial-gradient(circle,#2b1118,#080a10 70%);
+
+  border:1px solid rgba(255,255,255,.07);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.55),
+    0 0 40px rgba(255,23,68,.08);
 }
 
-.hero-overlay h1 {
-  font-size: 44px;
-  font-weight: 900;
-  text-shadow: 0 4px 30px rgba(0,0,0,0.8);
-  letter-spacing: -1px;
-  line-height: 1;
+.hero-gif{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+  opacity:.78;
+  transform:scale(1.02);
 }
 
-.hero-overlay h1 span {
-  color: #ff1744;
-  text-shadow: 0 0 40px rgba(255,23,68,0.6);
+.hero-overlay{
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  padding:30px 25px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.15),
+      rgba(0,0,0,.78)
+    );
 }
 
-.hero-overlay .subtitle {
-  font-size: 10px;
-  color: #ccc;
-  letter-spacing: 4px;
-  margin-top: 6px;
-  font-weight: 600;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+.hero-top{
+  position:absolute;
+  top:18px;
+  right:18px;
+  text-align:right;
 }
 
-.hero-overlay .badge-bottom {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,23,68,0.15);
-  backdrop-filter: blur(12px);
-  padding: 6px 18px;
-  border-radius: 30px;
-  font-size: 8px;
-  font-weight: 700;
-  color: #ff1744;
-  border: 1px solid rgba(255,23,68,0.15);
-  letter-spacing: 1.5px;
-  white-space: nowrap;
+.hero-top-label{
+  color:#999;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1px;
 }
 
-.hero-overlay .orb {
-  position: absolute;
-  bottom: 10px;
-  right: 16px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,23,68,0.4);
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(255,23,68,0.2);
+.hero-top-value{
+  color:#ff1744;
+  font-size:10px;
+  font-weight:900;
+  margin-top:3px;
 }
 
-.hero-overlay .orb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.hero-title{
+  font-size:46px;
+  line-height:.9;
+  font-weight:1000;
+  letter-spacing:-2px;
+
+  text-shadow:
+    0 5px 30px rgba(0,0,0,.8);
 }
 
-/* ===== QUICK NAV ===== */
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+.hero-title span{
+  color:#ff1744;
+  text-shadow:
+    0 0 35px rgba(255,23,68,.6);
 }
 
-.quick-item {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 20px;
-  padding: 16px 8px;
-  text-align: center;
-  transition: 0.2s;
-  cursor: pointer;
+.hero-subtitle{
+  margin-top:10px;
+  color:#ddd;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:4px;
 }
 
-.quick-item:active {
-  transform: scale(0.93);
+.hero-badge{
+  position:absolute;
+  bottom:17px;
+  left:18px;
+
+  padding:8px 15px;
+
+  border-radius:30px;
+
+  background:rgba(255,23,68,.12);
+  border:1px solid rgba(255,23,68,.2);
+
+  color:#ff4869;
+
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1.2px;
+
+  backdrop-filter:blur(12px);
 }
 
-.quick-item .icon {
-  font-size: 28px;
-  display: block;
-  margin-bottom: 6px;
+/* =========================================================
+   QUICK NAV
+========================================================= */
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+  margin-bottom:20px;
 }
 
-.quick-item .label {
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #ddd;
+.quick-item{
+  position:relative;
+
+  min-height:108px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  padding:12px 5px;
+
+  border-radius:22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.065),
+      rgba(255,255,255,.018)
+    );
+
+  border:1px solid rgba(255,255,255,.07);
+
+  transition:.18s;
+
+  overflow:hidden;
 }
 
-.quick-item .sub {
-  font-size: 6px;
-  color: #666;
-  margin-top: 4px;
+.quick-item::before{
+  content:"";
+  position:absolute;
+  width:55px;
+  height:55px;
+  top:-20px;
+  right:-20px;
+  border-radius:50%;
+  background:rgba(255,255,255,.04);
 }
 
-/* ===== SECTION HEADER ===== */
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 22px 4px 12px;
+.quick-item:active{
+  transform:scale(.94);
 }
 
-.section-head h2 {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+.quick-item .icon{
+  font-size:27px;
+  margin-bottom:7px;
 }
 
-.section-head span {
-  font-size: 8px;
-  color: #555;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+.quick-item .label{
+  font-size:8px;
+  font-weight:900;
+  color:#eee;
 }
 
-/* ===== GAME CARDS ===== */
-.game-card {
-  border-radius: 22px;
-  padding: 16px;
-  margin-bottom: 14px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(4px);
+.quick-item .sub{
+  margin-top:4px;
+  font-size:6px;
+  color:#666;
+  font-weight:700;
+  letter-spacing:.5px;
 }
 
-.game-card.pubg {
-  border-color: rgba(255, 200, 0, 0.25);
-  background: linear-gradient(145deg, rgba(255,200,0,0.06), rgba(0,0,0,0.2));
+/* =========================================================
+   SECTION
+========================================================= */
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin:24px 4px 11px;
 }
 
-.game-card.mlbb {
-  border-color: rgba(0, 180, 255, 0.25);
-  background: linear-gradient(145deg, rgba(0,180,255,0.06), rgba(0,0,0,0.2));
+.section-head h2{
+  font-size:16px;
+  font-weight:900;
 }
 
-.game-card.premium {
-  border-color: rgba(180, 80, 255, 0.25);
-  background: linear-gradient(145deg, rgba(180,80,255,0.06), rgba(0,0,0,0.2));
+.section-head span{
+  color:#555;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:1px;
 }
 
-.game-card.stars {
-  border-color: rgba(255, 215, 0, 0.25);
-  background: linear-gradient(145deg, rgba(255,215,0,0.06), rgba(0,0,0,0.2));
+/* =========================================================
+   GAME CARDS
+========================================================= */
+
+.game-card{
+  position:relative;
+
+  padding:17px;
+
+  margin-bottom:15px;
+
+  border-radius:25px;
+
+  overflow:hidden;
+
+  border:1px solid rgba(255,255,255,.07);
+
+  backdrop-filter:blur(10px);
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+.game-card::after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  top:-90px;
+  right:-60px;
+  border-radius:50%;
+  opacity:.18;
+  pointer-events:none;
 }
 
-.card-header .icon {
-  font-size: 26px;
+/* PUBG */
+
+.game-card.pubg{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,193,7,.10),
+      rgba(10,11,15,.95)
+    );
+
+  border-color:rgba(255,193,7,.22);
 }
 
-.card-header .title {
-  font-size: 15px;
-  font-weight: 800;
+.game-card.pubg::after{
+  background:#ffc107;
 }
 
-.card-header .badge {
-  margin-left: auto;
-  font-size: 7px;
-  background: rgba(255,255,255,0.06);
-  padding: 4px 12px;
-  border-radius: 30px;
-  color: #888;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+/* MLBB */
+
+.game-card.mlbb{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(0,180,255,.10),
+      rgba(7,12,20,.95)
+    );
+
+  border-color:rgba(0,180,255,.22);
 }
 
-.price-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 4px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+.game-card.mlbb::after{
+  background:#00b4ff;
 }
 
-.price-row:last-child {
-  border-bottom: none;
+/* PREMIUM */
+
+.game-card.premium{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(180,80,255,.12),
+      rgba(12,8,20,.95)
+    );
+
+  border-color:rgba(180,80,255,.23);
 }
 
-.product-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: #eee;
+.game-card.premium::after{
+  background:#b450ff;
 }
 
-.product-price {
-  font-size: 11px;
-  font-weight: 800;
-  color: #ffca28;
-  text-shadow: 0 0 20px rgba(255,202,40,0.15);
+/* STARS */
+
+.game-card.stars{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,215,0,.11),
+      rgba(15,13,6,.95)
+    );
+
+  border-color:rgba(255,215,0,.23);
 }
 
-.buy-btn {
-  border: none;
-  border-radius: 10px;
-  padding: 7px 14px;
-  color: #fff;
-  font-size: 8px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #ff1744, #b0002a);
-  letter-spacing: 0.5px;
-  transition: 0.15s;
+.game-card.stars::after{
+  background:#ffd700;
 }
 
-.buy-btn:active {
-  transform: scale(0.9);
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-header{
+  position:relative;
+  z-index:2;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  margin-bottom:10px;
 }
 
-/* ===== TRUST ===== */
-.trust-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 18px;
+.card-header .icon{
+  width:40px;
+  height:40px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:rgba(255,255,255,.06);
+
+  font-size:22px;
 }
 
-.trust-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 18px;
-  padding: 16px 6px;
-  text-align: center;
+.card-header .title{
+  font-size:14px;
+  font-weight:900;
 }
 
-.trust-item .icon {
-  font-size: 24px;
+.card-header .badge{
+  margin-left:auto;
+
+  padding:5px 10px;
+
+  border-radius:30px;
+
+  background:rgba(255,255,255,.05);
+
+  color:#888;
+
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.7px;
 }
 
-.trust-item .label {
-  font-size: 7px;
-  color: #777;
-  font-weight: 700;
-  margin-top: 6px;
-  display: block;
-  letter-spacing: 0.5px;
+/* =========================================================
+   PRODUCT ROW
+========================================================= */
+
+.price-row{
+  position:relative;
+  z-index:2;
+
+  display:grid;
+  grid-template-columns:1fr auto auto;
+
+  align-items:center;
+  gap:8px;
+
+  min-height:52px;
+
+  padding:8px 2px;
+
+  border-bottom:1px solid rgba(255,255,255,.045);
 }
 
-/* ===== FORM ===== */
-.form-card {
-  background: #11151e;
-  border-radius: 24px;
-  padding: 20px;
-  border: 1px solid rgba(255,255,255,0.06);
+.price-row:last-child{
+  border-bottom:none;
 }
 
-.form-card label {
-  display: block;
-  font-size: 10px;
-  color: #999;
-  font-weight: 700;
-  margin: 14px 0 6px;
-  letter-spacing: 0.3px;
+.product-name{
+  font-size:11px;
+  font-weight:800;
+  color:#eee;
+}
+
+.product-price{
+  font-size:11px;
+  font-weight:900;
+  color:#ffca28;
+}
+
+.buy-btn{
+  min-width:58px;
+
+  padding:8px 11px;
+
+  border:0;
+  border-radius:11px;
+
+  color:#fff;
+
+  font-size:8px;
+  font-weight:900;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff1744,
+      #9d0026
+    );
+
+  box-shadow:
+    0 6px 18px rgba(255,23,68,.18);
+
+  transition:.15s;
+}
+
+.buy-btn:active{
+  transform:scale(.9);
+}
+
+/* =========================================================
+   TRUST
+========================================================= */
+
+.trust-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:20px;
+}
+
+.trust-item{
+  padding:16px 5px;
+  text-align:center;
+
+  border-radius:20px;
+
+  background:rgba(255,255,255,.03);
+
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.trust-item .icon{
+  display:block;
+  font-size:23px;
+}
+
+.trust-item .label{
+  display:block;
+  margin-top:7px;
+
+  color:#777;
+
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+/* =========================================================
+   PAGE TITLE
+========================================================= */
+
+.page-title{
+  margin:5px 3px 15px;
+}
+
+.page-title h2{
+  font-size:22px;
+  font-weight:1000;
+}
+
+.page-title p{
+  margin-top:4px;
+  color:#666;
+  font-size:9px;
+  font-weight:700;
+}
+
+/* =========================================================
+   BACK
+========================================================= */
+
+.back{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  padding:9px 14px;
+
+  margin-bottom:15px;
+
+  border-radius:30px;
+
+  background:rgba(255,255,255,.045);
+
+  border:1px solid rgba(255,255,255,.06);
+
+  color:#aaa;
+
+  font-size:10px;
+  font-weight:800;
+
+  transition:.15s;
+}
+
+.back:active{
+  transform:scale(.94);
+}
+
+/* =========================================================
+   PAGE THEMES
+========================================================= */
+
+/* PUBG PAGE */
+
+.pubg-page{
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,193,7,.10),
+      transparent 40%
+    );
+  border-radius:25px;
+}
+
+/* MLBB PAGE */
+
+.mlbb-page{
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(0,180,255,.10),
+      transparent 40%
+    );
+  border-radius:25px;
+}
+
+/* PREMIUM PAGE */
+
+.premium-page{
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(180,80,255,.10),
+      transparent 40%
+    );
+  border-radius:25px;
+}
+
+/* STARS PAGE */
+
+.stars-page{
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,215,0,.10),
+      transparent 40%
+    );
+  border-radius:25px;
+}
+
+/* =========================================================
+   ORDER FORM
+========================================================= */
+
+.form-card{
+  padding:20px;
+
+  border-radius:25px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151a26,
+      #0b0e15
+    );
+
+  border:1px solid rgba(255,255,255,.07);
+
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.form-card label{
+  display:block;
+
+  margin:15px 0 6px;
+
+  color:#888;
+
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.4px;
 }
 
 .form-card input,
-.form-card select {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid #2a2f3e;
-  background: #080b12;
-  color: #fff;
-  font-size: 13px;
-  outline: none;
-  transition: 0.2s;
+.form-card select{
+  width:100%;
+
+  padding:14px;
+
+  border-radius:14px;
+
+  outline:none;
+
+  border:1px solid #292e3b;
+
+  background:#070a10;
+
+  color:#fff;
+
+  font-size:12px;
+
+  transition:.2s;
 }
 
 .form-card input:focus,
-.form-card select:focus {
-  border-color: #ff1744;
-  box-shadow: 0 0 25px rgba(255,23,68,0.08);
+.form-card select:focus{
+  border-color:#ff1744;
+
+  box-shadow:
+    0 0 20px rgba(255,23,68,.08);
 }
 
-.confirm-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ff1744, #b0002a);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  margin-top: 18px;
-  letter-spacing: 0.5px;
-  transition: 0.15s;
+.confirm-btn{
+  width:100%;
+
+  margin-top:18px;
+
+  padding:16px;
+
+  border:0;
+
+  border-radius:16px;
+
+  color:#fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff1744,
+      #a60029
+    );
+
+  font-size:12px;
+  font-weight:900;
+
+  box-shadow:
+    0 10px 30px rgba(255,23,68,.16);
+
+  transition:.15s;
 }
 
-.confirm-btn:active {
-  transform: scale(0.97);
+.confirm-btn:active{
+  transform:scale(.97);
 }
 
-.confirm-btn:disabled {
-  opacity: 0.5;
-  transform: none;
+.confirm-btn:disabled{
+  opacity:.5;
 }
 
-/* ===== ORDER CARDS ===== */
+/* =========================================================
+   ORDER CARDS
+========================================================= */
+
 .order-card,
-.admin-card {
-  background: linear-gradient(145deg, #151a26, #0c0f16);
-  border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
+.admin-card{
+  padding:17px;
+  margin-bottom:12px;
+
+  border-radius:21px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151a26,
+      #0b0e15
+    );
+
+  border:1px solid rgba(255,255,255,.06);
 }
 
-.order-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
 }
 
-.order-id {
-  font-size: 10px;
-  font-weight: 800;
-  color: #aaa;
+.order-id{
+  color:#999;
+  font-size:9px;
+  font-weight:900;
 }
 
-.order-product {
-  font-size: 13px;
-  font-weight: 700;
-  margin-top: 10px;
+.order-product{
+  margin-top:11px;
+
+  font-size:13px;
+  font-weight:900;
 }
 
-.order-price {
-  color: #ffca28;
-  font-size: 13px;
-  font-weight: 800;
-  margin-top: 4px;
+.order-price{
+  margin-top:4px;
+
+  color:#ffca28;
+
+  font-size:13px;
+  font-weight:900;
 }
 
-.order-info {
-  font-size: 9px;
-  color: #777;
-  margin-top: 4px;
+.order-info{
+  margin-top:5px;
+
+  color:#777;
+
+  font-size:8px;
+  line-height:1.4;
 }
 
-.status {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 30px;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
+.status{
+  display:inline-block;
+
+  padding:5px 10px;
+
+  border-radius:30px;
+
+  font-size:7px;
+  font-weight:900;
 }
 
-.status.pending {
-  color: #ffc107;
-  background: rgba(255,193,7,0.1);
-  border: 1px solid rgba(255,193,7,0.15);
+.status.pending{
+  color:#ffc107;
+  background:rgba(255,193,7,.10);
+  border:1px solid rgba(255,193,7,.15);
 }
 
-.status.success {
-  color: #18d66b;
-  background: rgba(24,214,107,0.1);
-  border: 1px solid rgba(24,214,107,0.15);
+.status.success{
+  color:#18d66b;
+  background:rgba(24,214,107,.10);
+  border:1px solid rgba(24,214,107,.15);
 }
 
-.status.cancelled {
-  color: #ff1744;
-  background: rgba(255,23,68,0.1);
-  border: 1px solid rgba(255,23,68,0.15);
+.status.cancelled{
+  color:#ff1744;
+  background:rgba(255,23,68,.10);
+  border:1px solid rgba(255,23,68,.15);
 }
 
-.order-message {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 9px;
-  font-weight: 700;
+.order-message{
+  margin-top:11px;
+  padding:10px;
+
+  border-radius:12px;
+
+  font-size:9px;
+  font-weight:800;
 }
 
-.msg-success {
-  background: rgba(24,214,107,0.06);
-  color: #18d66b;
+.msg-success{
+  color:#18d66b;
+  background:rgba(24,214,107,.06);
 }
 
-.msg-cancelled {
-  background: rgba(255,23,68,0.06);
-  color: #ff1744;
+.msg-cancelled{
+  color:#ff1744;
+  background:rgba(255,23,68,.06);
 }
 
-/* ===== ADMIN ===== */
-.admin-badge {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 30px;
-  background: rgba(255,23,68,0.1);
-  color: #ff1744;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255,23,68,0.1);
+/* =========================================================
+   ADMIN
+========================================================= */
+
+.admin-badge{
+  display:inline-block;
+
+  padding:8px 14px;
+  margin-bottom:12px;
+
+  border-radius:30px;
+
+  color:#ff1744;
+
+  background:rgba(255,23,68,.08);
+
+  border:1px solid rgba(255,23,68,.13);
+
+  font-size:8px;
+  font-weight:900;
 }
 
-.admin-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
+.admin-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+
+  margin-top:13px;
 }
 
 .approve-btn,
-.reject-btn {
-  padding: 12px;
-  border: none;
-  border-radius: 14px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
+.reject-btn{
+  padding:12px;
+
+  border:0;
+  border-radius:13px;
+
+  color:#fff;
+
+  font-size:9px;
+  font-weight:900;
+
+  transition:.15s;
 }
 
-.approve-btn {
-  background: linear-gradient(135deg, #18d66b, #0a9e4a);
+.approve-btn{
+  background:
+    linear-gradient(135deg,#18d66b,#079447);
 }
 
-.reject-btn {
-  background: linear-gradient(135deg, #ff1744, #b0002a);
+.reject-btn{
+  background:
+    linear-gradient(135deg,#ff1744,#a40027);
 }
 
 .approve-btn:active,
-.reject-btn:active {
-  transform: scale(0.94);
+.reject-btn:active{
+  transform:scale(.94);
 }
 
-/* ===== PROFILE ===== */
-.profile-box {
-  text-align: center;
-  padding: 20px 16px;
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-box{
+  text-align:center;
+  padding:25px 18px;
 }
 
-.profile-box img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #ff1744;
-  box-shadow: 0 0 40px rgba(255,23,68,0.2);
+.profile-box img{
+  width:105px;
+  height:105px;
+
+  object-fit:cover;
+
+  border-radius:50%;
+
+  padding:3px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff1744,
+      #ffca28
+    );
+
+  box-shadow:
+    0 0 45px rgba(255,23,68,.2);
 }
 
-.profile-box h2 {
-  font-size: 20px;
-  margin-top: 14px;
-  font-weight: 800;
+.profile-box h2{
+  margin-top:15px;
+
+  font-size:20px;
+  font-weight:900;
 }
 
-.profile-box p {
-  color: #888;
-  font-size: 12px;
-  margin-top: 4px;
+.profile-box p{
+  margin-top:5px;
+
+  color:#888;
+  font-size:11px;
 }
 
-.profile-box .sub {
-  color: #555;
-  font-size: 9px;
-  margin-top: 10px;
+.profile-box .sub{
+  margin-top:12px;
+  color:#555;
+  font-size:8px;
 }
 
-/* ===== MODAL ===== */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-  align-items: center;
-  justify-content: center;
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+
+  z-index:9999;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:rgba(0,0,0,.75);
+
+  backdrop-filter:blur(10px);
 }
 
-.modal-overlay.show {
-  display: flex;
+.modal-overlay.show{
+  display:flex;
 }
 
-.modal-box {
-  background: #191e2a;
-  border-radius: 28px;
-  padding: 32px 24px;
-  max-width: 320px;
-  width: 90%;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,0.06);
-  animation: modalPop 0.25s ease;
+.modal-box{
+  width:100%;
+  max-width:340px;
+
+  padding:28px 22px;
+
+  border-radius:27px;
+
+  text-align:center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #1b202d,
+      #0d1018
+    );
+
+  border:1px solid rgba(255,255,255,.07);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.7);
+
+  animation:modalPop .22s ease;
 }
 
-@keyframes modalPop {
-  from { transform: scale(0.85); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes modalPop{
+  from{
+    opacity:0;
+    transform:scale(.85);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
 }
 
-.modal-icon {
-  font-size: 52px;
+.modal-icon{
+  font-size:50px;
 }
 
-.modal-title {
-  font-size: 19px;
-  font-weight: 800;
-  margin: 8px 0 4px;
+.modal-title{
+  margin-top:8px;
+
+  font-size:19px;
+  font-weight:900;
 }
 
-.modal-msg {
-  font-size: 13px;
-  color: #aaa;
-  margin: 10px 0 18px;
-  line-height: 1.6;
+.modal-msg{
+  margin:10px 0 18px;
+
+  color:#aaa;
+
+  font-size:12px;
+
+  line-height:1.6;
 }
 
-.modal-btn {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ff1744, #b0002a);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
+.modal-btn{
+  width:100%;
+
+  padding:14px;
+
+  border:0;
+  border-radius:15px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff1744,
+      #a40027
+    );
+
+  color:#fff;
+
+  font-size:12px;
+  font-weight:900;
 }
 
-.modal-btn:active {
-  transform: scale(0.95);
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
+
+.bottom-nav{
+  position:fixed;
+
+  z-index:500;
+
+  bottom:8px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  width:calc(100% - 16px);
+  max-width:720px;
+
+  padding:6px 5px;
+
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+
+  border-radius:28px;
+
+  background:
+    rgba(9,11,17,.94);
+
+  border:1px solid rgba(255,255,255,.07);
+
+  backdrop-filter:blur(22px);
+
+  box-shadow:
+    0 15px 50px rgba(0,0,0,.65);
 }
 
-/* ===== BOTTOM NAV ===== */
-.bottom-nav {
-  position: fixed;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 16px);
-  max-width: 680px;
-  background: rgba(10,12,18,0.92);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 28px;
-  padding: 6px 4px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  z-index: 100;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+.nav-item{
+  min-height:52px;
+
+  display:flex;
+  flex-direction:column;
+
+  justify-content:center;
+  align-items:center;
+
+  gap:2px;
+
+  border-radius:19px;
+
+  color:#555;
+
+  font-size:7px;
+  font-weight:900;
+
+  transition:.15s;
 }
 
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-  border-radius: 18px;
-  color: #666;
-  font-size: 7px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.15s;
-  gap: 2px;
-  letter-spacing: 0.3px;
+.nav-item .icon{
+  font-size:19px;
 }
 
-.nav-item:active {
-  transform: scale(0.9);
+.nav-item:active{
+  transform:scale(.9);
 }
 
-.nav-item .icon {
-  font-size: 20px;
+.nav-item.active{
+  color:#ff1744;
+
+  background:
+    rgba(255,23,68,.08);
 }
 
-.nav-item.active {
-  color: #ff1744;
-  background: rgba(255,23,68,0.08);
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading{
+  padding:40px 10px;
+  text-align:center;
 }
 
-/* ===== LOADING ===== */
-.loading {
-  text-align: center;
-  padding: 40px 10px;
+.spinner{
+  width:32px;
+  height:32px;
+
+  display:inline-block;
+
+  border:3px solid rgba(255,255,255,.07);
+
+  border-top-color:#ff1744;
+
+  border-radius:50%;
+
+  animation:spin .7s linear infinite;
 }
 
-.spinner {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  border: 3px solid rgba(255,255,255,0.06);
-  border-top-color: #ff1744;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.loading-text{
+  margin-top:12px;
+
+  color:#777;
+
+  font-size:9px;
 }
 
-.loading-text {
-  color: #888;
-  font-size: 10px;
-  margin-top: 12px;
+.empty{
+  padding:40px 10px;
+
+  text-align:center;
+
+  color:#555;
+
+  font-size:10px;
 }
 
-.empty {
-  text-align: center;
-  padding: 40px 10px;
-  color: #555;
-  font-size: 11px;
+/* =========================================================
+   REFRESH
+========================================================= */
+
+.refresh-btn{
+  padding:8px 13px;
+
+  border:1px solid rgba(255,255,255,.07);
+
+  border-radius:30px;
+
+  background:rgba(255,255,255,.04);
+
+  color:#aaa;
+
+  font-size:8px;
+  font-weight:800;
 }
 
-/* ===== BACK ===== */
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 30px;
-  background: rgba(255,255,255,0.04);
-  color: #aaa;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-bottom: 14px;
-  border: 1px solid rgba(255,255,255,0.04);
-  transition: 0.15s;
+.refresh-btn:active{
+  transform:scale(.92);
 }
 
-.back:active {
-  transform: scale(0.94);
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:500px){
+
+  .app{
+    padding:9px;
+  }
+
+  .hero-video{
+    height:240px;
+  }
+
+  .hero-title{
+    font-size:36px;
+  }
+
+  .hero-subtitle{
+    font-size:7px;
+    letter-spacing:3px;
+  }
+
+  .quick-grid{
+    gap:6px;
+  }
+
+  .quick-item{
+    min-height:94px;
+    border-radius:18px;
+  }
+
+  .quick-item .icon{
+    font-size:22px;
+  }
+
+  .quick-item .label{
+    font-size:7px;
+  }
+
+  .quick-item .sub{
+    font-size:5px;
+  }
+
+  .product-name{
+    font-size:10px;
+  }
+
+  .product-price{
+    font-size:10px;
+  }
+
+  .buy-btn{
+    min-width:53px;
+    padding:7px 9px;
+  }
+
+  .bottom-nav{
+    bottom:6px;
+  }
 }
 
-/* ===== REFRESH ===== */
-.refresh-btn {
-  padding: 8px 14px;
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.04);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.15s;
+@media(max-width:360px){
+
+  .hero-video{
+    height:215px;
+  }
+
+  .hero-title{
+    font-size:32px;
+  }
+
+  .logo-main{
+    font-size:19px;
+  }
+
+  .logo-icon{
+    width:40px;
+    height:40px;
+  }
+
+  .user-mini{
+    width:44px;
+    height:44px;
+  }
+
+  .price-row{
+    grid-template-columns:1fr auto auto;
+    gap:5px;
+  }
 }
 
-.refresh-btn:active {
-  transform: scale(0.92);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 430px) {
-  .hero-video video { height: 220px; }
-  .hero-overlay h1 { font-size: 32px; }
-  .hero-overlay .orb { width: 44px; height: 44px; }
-  .quick-grid { gap: 6px; }
-  .quick-item { padding: 12px 4px; }
-  .quick-item .icon { font-size: 22px; }
-  .bottom-nav { padding: 4px 2px; }
-  .nav-item .icon { font-size: 17px; }
-  .nav-item { font-size: 6px; }
-}
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
-<!-- ===== HOME ===== -->
+<!-- ======================================================
+     HOME
+====================================================== -->
+
 <div id="homePage" class="page active">
 
-  <!-- HEADER -->
   <div class="header">
+
     <div class="logo">
+
       <div class="logo-icon">👑</div>
+
       <div>
-        <div class="logo-main"><span>CENTRAL</span> SHOP</div>
-        <div class="logo-sub">FAST • SAFE • TRUSTED</div>
+        <div class="logo-main">
+          <span>CENTRAL</span> SHOP
+        </div>
+
+        <div class="logo-sub">
+          FAST • SAFE • TRUSTED
+        </div>
       </div>
+
     </div>
+
     <div class="user-mini">
-      <img id="headerAvatar" src="https://via.placeholder.com/48/ff1744/fff?text=U">
+      <img
+        id="headerAvatar"
+        src="https://via.placeholder.com/100/ff1744/ffffff?text=U"
+        alt="User">
     </div>
+
   </div>
 
-  <!-- VIDEO HERO -->
+
+  <!-- ====================================================
+       CENTRAL CEE GIF
+  ===================================================== -->
+
   <div class="hero-video">
-    <!-- Central Cee Video -->
-    <video autoplay muted loop playsinline>
-      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-    </video>
+
+    <!--
+      IMPORTANT:
+      Replace the URL below with your Central Cee GIF URL.
+
+      Example:
+      https://your-domain.com/central-cee.gif
+
+      You can also upload your GIF to your hosting/server
+      and put the direct .gif URL here.
+    -->
+
+    <img
+      id="centralCeeGif"
+      class="hero-gif"
+      src="https://media.giphy.com/media/placeholder.gif"
+      alt="Central Cee">
+
     <div class="hero-overlay">
-      <!-- Top Right: Trusted Service -->
-      <div class="top-right">
-        <div class="label">TRUSTED SERVICE</div>
-        <div class="highlight">24/7 SUPPORT</div>
+
+      <div class="hero-top">
+        <div class="hero-top-label">
+          TRUSTED SERVICE
+        </div>
+
+        <div class="hero-top-value">
+          24/7 SUPPORT
+        </div>
       </div>
 
-      <!-- Center: CENTRAL SHOP -->
-      <h1>CENTRAL<br><span>SHOP</span></h1>
-      <div class="subtitle">PREMIUM DIGITAL SHOP</div>
-
-      <!-- Bottom Badge -->
-      <div class="badge-bottom">🔥 FAST • SAFE • TRUSTED</div>
-
-      <!-- Orb (Central Cee image) -->
-      <div class="orb">
-        <img src="https://via.placeholder.com/60/ff1744/fff?text=CC">
+      <div class="hero-title">
+        CENTRAL
+        <br>
+        <span>SHOP</span>
       </div>
+
+      <div class="hero-subtitle">
+        PREMIUM DIGITAL SHOP
+      </div>
+
+      <div class="hero-badge">
+        🔥 FAST • SAFE • TRUSTED
+      </div>
+
     </div>
+
   </div>
 
-  <!-- QUICK NAV -->
+
+  <!-- QUICK MENU -->
+
   <div class="quick-grid">
-    <div class="quick-item" onclick="openPage('pubgPage')">
+
+    <div
+      class="quick-item"
+      onclick="openPage('pubgPage')">
+
       <span class="icon">🎮</span>
       <span class="label">PUBG UC</span>
       <span class="sub">ALL SERVER</span>
+
     </div>
-    <div class="quick-item" onclick="openPage('mlbbPage')">
+
+
+    <div
+      class="quick-item"
+      onclick="openPage('mlbbPage')">
+
       <span class="icon">💎</span>
       <span class="label">MLBB DIA</span>
       <span class="sub">DIAMONDS</span>
+
     </div>
-    <div class="quick-item" onclick="openPage('premiumPage')">
+
+
+    <div
+      class="quick-item"
+      onclick="openPage('premiumPage')">
+
       <span class="icon">👑</span>
       <span class="label">PREMIUM</span>
       <span class="sub">TELEGRAM</span>
+
     </div>
-    <div class="quick-item" onclick="comingSoon('Telegram Stars')">
+
+
+    <div
+      class="quick-item"
+      onclick="openPage('starsPage')">
+
       <span class="icon">⭐</span>
       <span class="label">STARS</span>
       <span class="sub">TOP UP</span>
+
     </div>
+
   </div>
 
-  <!-- PUBG SECTION -->
+
+  <!-- PUBG -->
+
   <div class="section-head">
     <h2>🎮 PUBG UC</h2>
     <span>ALL SERVER</span>
   </div>
+
   <div class="game-card pubg">
+
     <div class="card-header">
+
       <span class="icon">🎮</span>
-      <span class="title" style="color:#ffc107;">PUBG UC</span>
-      <span class="badge">🔥 HOT</span>
+
+      <span
+        class="title"
+        style="color:#ffc107;">
+        PUBG UC
+      </span>
+
+      <span class="badge">
+        🔥 HOT
+      </span>
+
     </div>
+
     <div id="pubgHome"></div>
+
   </div>
 
-  <!-- MLBB SECTION -->
+
+  <!-- MLBB -->
+
   <div class="section-head">
     <h2>💎 MLBB Diamonds</h2>
     <span>DIAMONDS</span>
   </div>
+
   <div class="game-card mlbb">
+
     <div class="card-header">
+
       <span class="icon">💎</span>
-      <span class="title" style="color:#00b4ff;">MLBB DIAMONDS</span>
-      <span class="badge">💎 TOP</span>
+
+      <span
+        class="title"
+        style="color:#00b4ff;">
+        MLBB DIAMONDS
+      </span>
+
+      <span class="badge">
+        💎 TOP
+      </span>
+
     </div>
+
     <div id="mlbbHome"></div>
+
   </div>
 
-  <!-- PREMIUM SECTION -->
+
+  <!-- PREMIUM -->
+
   <div class="section-head">
     <h2>👑 Telegram Premium</h2>
     <span>PREMIUM</span>
   </div>
+
   <div class="game-card premium">
+
     <div class="card-header">
+
       <span class="icon">👑</span>
-      <span class="title" style="color:#b450ff;">TELEGRAM PREMIUM</span>
-      <span class="badge">⭐ VIP</span>
+
+      <span
+        class="title"
+        style="color:#b450ff;">
+        TELEGRAM PREMIUM
+      </span>
+
+      <span class="badge">
+        ⭐ VIP
+      </span>
+
     </div>
+
     <div id="premiumHome"></div>
+
   </div>
 
-  <!-- STARS SECTION -->
+
+  <!-- STARS -->
+
   <div class="section-head">
     <h2>⭐ Telegram Stars</h2>
     <span>STARS</span>
   </div>
+
   <div class="game-card stars">
+
     <div class="card-header">
+
       <span class="icon">⭐</span>
-      <span class="title" style="color:#ffd700;">TELEGRAM STARS</span>
-      <span class="badge">✨ NEW</span>
+
+      <span
+        class="title"
+        style="color:#ffd700;">
+        TELEGRAM STARS
+      </span>
+
+      <span class="badge">
+        ✨ NEW
+      </span>
+
     </div>
+
     <div id="starsHome"></div>
+
   </div>
 
+
   <!-- TRUST -->
+
   <div class="trust-row">
+
     <div class="trust-item">
       <span class="icon">🛡️</span>
       <span class="label">SAFE SERVICE</span>
     </div>
+
     <div class="trust-item">
       <span class="icon">⚡</span>
       <span class="label">FAST DELIVERY</span>
     </div>
+
     <div class="trust-item">
       <span class="icon">💯</span>
       <span class="label">TRUSTED SHOP</span>
     </div>
+
   </div>
 
 </div>
 
-<!-- ===== PUBG PAGE ===== -->
-<div id="pubgPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <h2>🎮 PUBG UC</h2>
+
+<!-- ======================================================
+     PUBG PAGE
+====================================================== -->
+
+<div id="pubgPage" class="page pubg-page">
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
+  <div class="page-title">
+
+    <h2>🎮 PUBG UC</h2>
+
+    <p>
+      UC TOP UP • ALL SERVER • FAST DELIVERY
+    </p>
+
+  </div>
+
   <div class="game-card pubg">
+
     <div class="card-header">
+
       <span class="icon">🎮</span>
-      <span class="title" style="color:#ffc107;">PUBG UC</span>
-      <span class="badge">ALL SERVER</span>
+
+      <span
+        class="title"
+        style="color:#ffc107;">
+        PUBG UC
+      </span>
+
+      <span class="badge">
+        ALL SERVER
+      </span>
+
     </div>
+
     <div id="pubgPageList"></div>
+
   </div>
+
 </div>
 
-<!-- ===== MLBB PAGE ===== -->
-<div id="mlbbPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <h2>💎 MLBB Diamonds</h2>
+
+<!-- ======================================================
+     MLBB PAGE
+====================================================== -->
+
+<div id="mlbbPage" class="page mlbb-page">
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
+  <div class="page-title">
+
+    <h2>💎 MLBB Diamonds</h2>
+
+    <p>
+      DIAMONDS • WEEKLY PASS • BONUS
+    </p>
+
+  </div>
+
   <div class="game-card mlbb">
+
     <div class="card-header">
+
       <span class="icon">💎</span>
-      <span class="title" style="color:#00b4ff;">MLBB DIAMONDS</span>
-      <span class="badge">DIAMONDS</span>
+
+      <span
+        class="title"
+        style="color:#00b4ff;">
+        MLBB DIAMONDS
+      </span>
+
+      <span class="badge">
+        DIAMONDS
+      </span>
+
     </div>
+
     <div id="mlbbPageList"></div>
+
   </div>
+
 </div>
 
-<!-- ===== PREMIUM PAGE ===== -->
-<div id="premiumPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <h2>👑 Telegram Premium</h2>
+
+<!-- ======================================================
+     PREMIUM PAGE
+====================================================== -->
+
+<div id="premiumPage" class="page premium-page">
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
+  <div class="page-title">
+
+    <h2>👑 Telegram Premium</h2>
+
+    <p>
+      PREMIUM MEMBERSHIP • VIP SERVICE
+    </p>
+
+  </div>
+
   <div class="game-card premium">
+
     <div class="card-header">
+
       <span class="icon">👑</span>
-      <span class="title" style="color:#b450ff;">TELEGRAM PREMIUM</span>
-      <span class="badge">PREMIUM</span>
+
+      <span
+        class="title"
+        style="color:#b450ff;">
+        TELEGRAM PREMIUM
+      </span>
+
+      <span class="badge">
+        VIP
+      </span>
+
     </div>
+
     <div id="premiumPageList"></div>
+
   </div>
+
 </div>
 
-<!-- ===== STARS PAGE ===== -->
-<div id="starsPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <h2>⭐ Telegram Stars</h2>
+
+<!-- ======================================================
+     STARS PAGE
+====================================================== -->
+
+<div id="starsPage" class="page stars-page">
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
+  <div class="page-title">
+
+    <h2>⭐ Telegram Stars</h2>
+
+    <p>
+      STARS TOP UP • FAST DELIVERY
+    </p>
+
+  </div>
+
   <div class="game-card stars">
+
     <div class="card-header">
+
       <span class="icon">⭐</span>
-      <span class="title" style="color:#ffd700;">TELEGRAM STARS</span>
-      <span class="badge">STARS</span>
+
+      <span
+        class="title"
+        style="color:#ffd700;">
+        TELEGRAM STARS
+      </span>
+
+      <span class="badge">
+        NEW
+      </span>
+
     </div>
+
     <div id="starsPageList"></div>
+
   </div>
+
 </div>
 
-<!-- ===== ORDER PAGE ===== -->
+
+<!-- ======================================================
+     ORDER PAGE
+====================================================== -->
+
 <div id="orderPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <h2>🛒 Create Order</h2>
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
+  <div class="page-title">
+
+    <h2>🛒 Create Order</h2>
+
+    <p>
+      CHECK YOUR INFORMATION BEFORE SUBMITTING
+    </p>
+
+  </div>
+
   <div class="form-card">
-    <label>Product</label>
-    <input id="orderProduct" readonly>
-    <label>Price</label>
-    <input id="orderPrice" readonly>
-    <label>Player ID / Username</label>
-    <input id="playerId" placeholder="Enter Player ID / Username">
-    <label>Server ID</label>
-    <input id="serverId" placeholder="Enter Server ID">
-    <label>Payment Method</label>
+
+    <label>
+      PRODUCT
+    </label>
+
+    <input
+      id="orderProduct"
+      readonly>
+
+
+    <label>
+      PRICE
+    </label>
+
+    <input
+      id="orderPrice"
+      readonly>
+
+
+    <label>
+      PLAYER ID / USERNAME
+    </label>
+
+    <input
+      id="playerId"
+      placeholder="Enter Player ID / Username">
+
+
+    <label>
+      SERVER ID
+    </label>
+
+    <input
+      id="serverId"
+      placeholder="Enter Server ID">
+
+
+    <label>
+      PAYMENT METHOD
+    </label>
+
     <select id="payment">
-      <option value="Manual Payment">Manual Payment</option>
-      <option value="KBZ Pay">KBZ Pay</option>
-      <option value="Wave Pay">Wave Pay</option>
-      <option value="USDT">USDT</option>
+
+      <option value="Manual Payment">
+        Manual Payment
+      </option>
+
+      <option value="KBZ Pay">
+        KBZ Pay
+      </option>
+
+      <option value="Wave Pay">
+        Wave Pay
+      </option>
+
+      <option value="USDT">
+        USDT
+      </option>
+
     </select>
-    <button class="confirm-btn" id="submitBtn" onclick="submitOrder()">🛒 CONFIRM ORDER</button>
+
+
+    <button
+      class="confirm-btn"
+      id="submitBtn"
+      onclick="submitOrder()">
+
+      🛒 CONFIRM ORDER
+
+    </button>
+
   </div>
+
 </div>
 
-<!-- ===== MY ORDERS ===== -->
+
+<!-- ======================================================
+     MY ORDERS
+====================================================== -->
+
 <div id="ordersPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-    <h2 style="margin:0;">📦 My Orders</h2>
-    <button class="refresh-btn" onclick="loadMyOrders()">🔄 Refresh</button>
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
   </div>
+
+  <div
+    style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:13px;
+    ">
+
+    <h2
+      style="
+        font-size:20px;
+        font-weight:900;
+      ">
+      📦 My Orders
+    </h2>
+
+    <button
+      class="refresh-btn"
+      onclick="loadMyOrders()">
+
+      🔄 Refresh
+
+    </button>
+
+  </div>
+
   <div id="ordersList"></div>
+
 </div>
 
-<!-- ===== PROFILE ===== -->
+
+<!-- ======================================================
+     PROFILE
+====================================================== -->
+
 <div id="profilePage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
+
+  <div
+    class="back"
+    onclick="openPage('homePage')">
+    ← Back
+  </div>
+
   <div class="form-card profile-box">
-    <img id="profileImage" src="https://via.placeholder.com/100/ff1744/fff?text=U">
-    <h2 id="profileName">Telegram User</h2>
-    <p id="profileUsername">@username</p>
-    <p class="sub">🎮 Welcome to Central Shop</p>
-    <div id="adminAccess" style="margin-top:18px;display:none;">
-      <button class="confirm-btn" onclick="openAdmin()">🛡️ Admin Panel</button>
+
+    <img
+      id="profileImage"
+      src="https://via.placeholder.com/100/ff1744/ffffff?text=U"
+      alt="Profile">
+
+    <h2 id="profileName">
+      Telegram User
+    </h2>
+
+    <p id="profileUsername">
+      @username
+    </p>
+
+    <p class="sub">
+      👑 Welcome to Central Shop
+    </p>
+
+    <div
+      id="adminAccess"
+      style="
+        margin-top:18px;
+        display:none;
+      ">
+
+      <button
+        class="confirm-btn"
+        onclick="openAdmin()">
+
+        🛡️ ADMIN PANEL
+
+      </button>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- ===== ADMIN ===== -->
+
+<!-- ======================================================
+     ADMIN
+====================================================== -->
+
 <div id="adminPage" class="page">
-  <div class="back" onclick="openPage('homePage')">← Back</div>
-  <div class="admin-badge">🛡️ ADMIN PANEL</div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-    <h2 style="margin:0;">📦 Orders</h2>
-    <button class="refresh-btn" onclick="loadAdminOrders()">🔄 Refresh</button>
+
+  <div
+    class="back"
+    onclick="openPage('profilePage')">
+    ← Back
   </div>
+
+  <div class="admin-badge">
+    🛡️ ADMIN PANEL
+  </div>
+
+  <div
+    style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    ">
+
+    <h2
+      style="
+        font-size:20px;
+        font-weight:900;
+      ">
+      📦 Orders
+    </h2>
+
+    <button
+      class="refresh-btn"
+      onclick="loadAdminOrders()">
+
+      🔄 Refresh
+
+    </button>
+
+  </div>
+
   <div id="adminOrdersList"></div>
-</div>
 
 </div>
 
-<!-- ===== MODAL ===== -->
-<div id="modalOverlay" class="modal-overlay">
+</div>
+
+
+<!-- ======================================================
+     MODAL
+====================================================== -->
+
+<div
+  id="modalOverlay"
+  class="modal-overlay">
+
   <div class="modal-box">
-    <div class="modal-icon" id="modalIcon">✅</div>
-    <div class="modal-title" id="modalTitle">Success</div>
-    <div class="modal-msg" id="modalMsg">Done</div>
-    <button class="modal-btn" onclick="closeModal()">OK</button>
+
+    <div
+      class="modal-icon"
+      id="modalIcon">
+      ✅
+    </div>
+
+    <div
+      class="modal-title"
+      id="modalTitle">
+      Success
+    </div>
+
+    <div
+      class="modal-msg"
+      id="modalMsg">
+      Done
+    </div>
+
+    <button
+      class="modal-btn"
+      onclick="closeModal()">
+
+      OK
+
+    </button>
+
   </div>
+
 </div>
 
-<!-- ===== BOTTOM NAV ===== -->
+
+<!-- ======================================================
+     BOTTOM NAV
+====================================================== -->
+
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="openPage('homePage')">
-    <span class="icon">🏠</span> HOME
+
+  <div
+    class="nav-item active"
+    onclick="openPage('homePage')">
+
+    <span class="icon">🏠</span>
+    HOME
+
   </div>
-  <div class="nav-item" onclick="openPage('pubgPage')">
-    <span class="icon">🎮</span> PUBG
+
+  <div
+    class="nav-item"
+    onclick="openPage('pubgPage')">
+
+    <span class="icon">🎮</span>
+    PUBG
+
   </div>
-  <div class="nav-item" onclick="openPage('mlbbPage')">
-    <span class="icon">💎</span> MLBB
+
+  <div
+    class="nav-item"
+    onclick="openPage('mlbbPage')">
+
+    <span class="icon">💎</span>
+    MLBB
+
   </div>
-  <div class="nav-item" onclick="openPage('premiumPage')">
-    <span class="icon">👑</span> PREM
+
+  <div
+    class="nav-item"
+    onclick="openPage('premiumPage')">
+
+    <span class="icon">👑</span>
+    PREM
+
   </div>
-  <div class="nav-item" onclick="openProfile()">
-    <span class="icon">👤</span> PROFILE
+
+  <div
+    class="nav-item"
+    onclick="openProfile()">
+
+    <span class="icon">👤</span>
+    PROFILE
+
   </div>
+
 </div>
+
 
 <script>
 
-// ===== TELEGRAM =====
+/* =========================================================
+   TELEGRAM
+========================================================= */
+
 const tg = window.Telegram.WebApp;
+
 tg.ready();
 tg.expand();
 
-// ===== CONSTANTS =====
-const API_URL = "https://script.google.com/macros/s/AKfycbzVXG7SdqEnr0lhHKhRQWM5EUK40xfhbaAagGUrrUjgR7QfxFGBELg4cqP1om8bs6ve/exec";
-const ADMIN_IDS = ["8758413326"];
 
-// ===== PRODUCTS =====
-const PUBG_UC = [
-  ["60 UC","4,100 Ks"],["180 UC","12,200 Ks"],["325 UC","20,300 Ks"],
-  ["385 UC","24,400 Ks"],["660 UC","40,500 Ks"],["720 UC","44,600 Ks"],
-  ["985 UC","60,700 Ks"],["1320 UC","81,100 Ks"],["1800 UC","101,600 Ks"],
-  ["3850 UC","200,600 Ks"],["8100 UC","393,700 Ks"]
+/* =========================================================
+   API
+========================================================= */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbzVXG7SdqEnr0lhHKhRQWM5EUK40xfhbaAagGUrrUjgR7QfxFGBELg4cqP1om8bs6ve/exec";
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+const ADMIN_IDS = [
+  "8758413326"
 ];
+
+
+/* =========================================================
+   CENTRAL CEE GIF
+========================================================= */
+
+/*
+  ဒီနေရာမှာ သင့် Central Cee GIF direct URL ထည့်ပါ။
+
+  ဥပမာ
+
+  const CENTRAL_CEE_GIF =
+  "https://yourwebsite.com/central-cee.gif";
+
+*/
+
+const CENTRAL_CEE_GIF =
+"https://media.giphy.com/media/placeholder.gif";
+
+document.getElementById("centralCeeGif").src =
+  CENTRAL_CEE_GIF;
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+const PUBG_UC = [
+
+  ["60 UC","4,100 Ks"],
+  ["180 UC","12,200 Ks"],
+  ["325 UC","20,300 Ks"],
+  ["385 UC","24,400 Ks"],
+  ["660 UC","40,500 Ks"],
+  ["720 UC","44,600 Ks"],
+  ["985 UC","60,700 Ks"],
+  ["1320 UC","81,100 Ks"],
+  ["1800 UC","101,600 Ks"],
+  ["3850 UC","200,600 Ks"],
+  ["8100 UC","393,700 Ks"]
+
+];
+
 
 const MLBB_DIA = [
-  ["5 Diamonds","500 MMK"],["11 Diamonds","1,000 MMK"],["22 Diamonds","2,000 MMK"],
-  ["86 Diamonds","6,000 MMK"],["175 Diamonds","11,500 MMK"],["257 Diamonds","16,500 MMK"],
-  ["343 Diamonds","22,000 MMK"],["429 Diamonds","27,500 MMK"],["515 Diamonds","33,000 MMK"],
-  ["600 Diamonds","38,000 MMK"],["706 Diamonds","44,000 MMK"],["1049 Diamonds","67,000 MMK"],
-  ["1135 Diamonds","71,000 MMK"],["2195 Diamonds","140,000 MMK"],["Weekly Pass","6,600 MMK"],
-  ["Twilight Pass","38,000 MMK"],["50+50 Bonus","4,000 MMK"],["150+150 Bonus","11,000 MMK"],
-  ["250+250 Bonus","17,500 MMK"],["500+500 Bonus","35,500 MMK"]
+
+  ["5 Diamonds","500 MMK"],
+  ["11 Diamonds","1,000 MMK"],
+  ["22 Diamonds","2,000 MMK"],
+  ["86 Diamonds","6,000 MMK"],
+  ["175 Diamonds","11,500 MMK"],
+  ["257 Diamonds","16,500 MMK"],
+  ["343 Diamonds","22,000 MMK"],
+  ["429 Diamonds","27,500 MMK"],
+  ["515 Diamonds","33,000 MMK"],
+  ["600 Diamonds","38,000 MMK"],
+  ["706 Diamonds","44,000 MMK"],
+  ["1049 Diamonds","67,000 MMK"],
+  ["1135 Diamonds","71,000 MMK"],
+  ["2195 Diamonds","140,000 MMK"],
+  ["Weekly Pass","6,600 MMK"],
+  ["Twilight Pass","38,000 MMK"],
+  ["50+50 Bonus","4,000 MMK"],
+  ["150+150 Bonus","11,000 MMK"],
+  ["250+250 Bonus","17,500 MMK"],
+  ["500+500 Bonus","35,500 MMK"]
+
 ];
+
 
 const PREMIUM = [
-  ["⭐ 1 Month","25,000 Ks"],["🎁 3 Months","60,000 Ks"],
-  ["🎁 6 Months","85,000 Ks"],["🎁 12 Months","145,000 Ks"]
+
+  ["⭐ 1 Month","25,000 Ks"],
+  ["🎁 3 Months","60,000 Ks"],
+  ["🎁 6 Months","85,000 Ks"],
+  ["🎁 12 Months","145,000 Ks"]
+
 ];
+
 
 const STARS = [
-  ["⭐ 100 Stars","5,000 Ks"],["⭐ 250 Stars","12,000 Ks"],
-  ["⭐ 500 Stars","22,000 Ks"],["⭐ 1000 Stars","42,000 Ks"]
+
+  ["⭐ 100 Stars","5,000 Ks"],
+  ["⭐ 250 Stars","12,000 Ks"],
+  ["⭐ 500 Stars","22,000 Ks"],
+  ["⭐ 1000 Stars","42,000 Ks"]
+
 ];
 
-// ===== HELPERS =====
-function getUser() {
+
+/* =========================================================
+   USER
+========================================================= */
+
+function getUser(){
+
   return tg.initDataUnsafe?.user || null;
+
 }
 
-function getTelegramId() {
-  return getUser() ? String(getUser().id) : "";
-}
 
-function isAdmin() {
-  return ADMIN_IDS.includes(getTelegramId());
-}
+function getTelegramId(){
 
-function escapeHTML(v) {
-  return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-}
-
-function safeJS(v) {
-  return String(v ?? "").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,"\\n").replace(/\r/g,"\\r");
-}
-
-// ===== MODAL =====
-function showModal(icon, title, msg) {
-  document.getElementById("modalIcon").textContent = icon || "✅";
-  document.getElementById("modalTitle").textContent = title || "Success";
-  document.getElementById("modalMsg").innerHTML = msg || "";
-  document.getElementById("modalOverlay").classList.add("show");
-}
-
-function closeModal() {
-  document.getElementById("modalOverlay").classList.remove("show");
-}
-
-// ===== PAGE =====
-function openPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const page = document.getElementById(id);
-  if (page) {
-    page.classList.add("active");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  const navMap = { homePage:0, pubgPage:1, mlbbPage:2, premiumPage:3, profilePage:4 };
-  const idx = navMap[id] ?? -1;
-  if (idx >= 0) document.querySelectorAll(".nav-item")[idx]?.classList.add("active");
-}
-
-// ===== RENDER PRODUCTS =====
-function renderProducts(data, containerId) {
-  const box = document.getElementById(containerId);
-  if (!box) return;
-  box.innerHTML = "";
-  data.forEach(item => {
-    const row = document.createElement("div");
-    row.className = "price-row";
-    row.innerHTML = `
-      <div class="product-name">${escapeHTML(item[0])}</div>
-      <div class="product-price">${escapeHTML(item[1])}</div>
-      <button class="buy-btn">BUY</button>
-    `;
-    row.querySelector("button").onclick = () => buyProduct(item[0], item[1]);
-    box.appendChild(row);
-  });
-}
-
-// ===== INIT =====
-renderProducts(PUBG_UC, "pubgHome");
-renderProducts(PUBG_UC, "pubgPageList");
-renderProducts(MLBB_DIA, "mlbbHome");
-renderProducts(MLBB_DIA, "mlbbPageList");
-renderProducts(PREMIUM, "premiumHome");
-renderProducts(PREMIUM, "premiumPageList");
-renderProducts(STARS, "starsHome");
-renderProducts(STARS, "starsPageList");
-
-// ===== BUY =====
-function buyProduct(product, price) {
-  document.getElementById("orderProduct").value = product;
-  document.getElementById("orderPrice").value = price;
-  document.getElementById("playerId").value = "";
-  document.getElementById("serverId").value = "";
-  openPage("orderPage");
-}
-
-// ===== API =====
-async function apiPost(data) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(data)
-  });
-  const text = await res.text();
-  try { return JSON.parse(text); } catch(e) { throw new Error("Server error"); }
-}
-
-// ===== SUBMIT ORDER =====
-async function submitOrder() {
-  const product = document.getElementById("orderProduct").value;
-  const price = document.getElementById("orderPrice").value;
-  const playerId = document.getElementById("playerId").value.trim();
-  const serverId = document.getElementById("serverId").value.trim();
-  const payment = document.getElementById("payment").value;
   const user = getUser();
 
-  if (!product) return showModal("⚠️", "Missing Product", "Please select a product.");
-  if (!playerId) return showModal("⚠️", "Missing Player ID", "Enter your Player ID / Username.");
-  if (!user) return showModal("⚠️", "Not Connected", "Open from Telegram.");
+  return user
+    ? String(user.id)
+    : "";
 
-  const btn = document.getElementById("submitBtn");
-  btn.disabled = true;
-  btn.textContent = "⏳ CREATING...";
+}
 
-  try {
-    const result = await apiPost({
-      action: "createOrder",
-      telegramId: String(user.id),
-      username: user.username || "",
-      firstName: user.first_name || "",
-      lastName: user.last_name || "",
-      product, price, playerId, serverId, payment
+
+function isAdmin(){
+
+  return ADMIN_IDS.includes(
+    getTelegramId()
+  );
+
+}
+
+
+/* =========================================================
+   SECURITY HELPERS
+========================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function safeJS(value){
+
+  return String(value ?? "")
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'")
+    .replace(/"/g,'\\"')
+    .replace(/\n/g,"\\n")
+    .replace(/\r/g,"\\r");
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function showModal(
+  icon,
+  title,
+  msg
+){
+
+  document.getElementById(
+    "modalIcon"
+  ).textContent = icon || "✅";
+
+  document.getElementById(
+    "modalTitle"
+  ).textContent = title || "Success";
+
+  document.getElementById(
+    "modalMsg"
+  ).innerHTML = msg || "";
+
+  document.getElementById(
+    "modalOverlay"
+  ).classList.add("show");
+
+}
+
+
+function closeModal(){
+
+  document.getElementById(
+    "modalOverlay"
+  ).classList.remove("show");
+
+}
+
+
+/* =========================================================
+   PAGE SYSTEM
+========================================================= */
+
+function openPage(id){
+
+  /*
+    အရေးကြီးဆုံး FIX
+
+    Page တစ်ခုဖွင့်တိုင်း
+    အခြား page အားလုံးကို hide လုပ်ပါတယ်။
+  */
+
+  document
+    .querySelectorAll(".page")
+    .forEach(page => {
+
+      page.classList.remove("active");
+
     });
 
-    if (result.success) {
-      showModal("✅", "Order Created!", `📦 Order ID: <b>${escapeHTML(result.orderId)}</b><br><br>⏳ Status: <b>PENDING</b><br><br>👤 Wait for admin confirmation.`);
-      openPage("ordersPage");
+
+  const page =
+    document.getElementById(id);
+
+
+  if(!page){
+
+    console.error(
+      "Page not found:",
+      id
+    );
+
+    return;
+
+  }
+
+
+  page.classList.add("active");
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+
+  /* Bottom navigation */
+
+  document
+    .querySelectorAll(".nav-item")
+    .forEach(nav => {
+
+      nav.classList.remove("active");
+
+    });
+
+
+  const navMap = {
+
+    homePage:0,
+    pubgPage:1,
+    mlbbPage:2,
+    premiumPage:3,
+    profilePage:4
+
+  };
+
+
+  const index =
+    navMap[id] ?? -1;
+
+
+  if(index >= 0){
+
+    document
+      .querySelectorAll(".nav-item")
+      [index]
+      ?.classList.add("active");
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER PRODUCTS
+========================================================= */
+
+function renderProducts(
+  data,
+  containerId
+){
+
+  const box =
+    document.getElementById(
+      containerId
+    );
+
+
+  if(!box){
+
+    return;
+
+  }
+
+
+  box.innerHTML = "";
+
+
+  data.forEach(item => {
+
+    const row =
+      document.createElement("div");
+
+
+    row.className =
+      "price-row";
+
+
+    row.innerHTML = `
+
+      <div class="product-name">
+        ${escapeHTML(item[0])}
+      </div>
+
+      <div class="product-price">
+        ${escapeHTML(item[1])}
+      </div>
+
+      <button class="buy-btn">
+        BUY
+      </button>
+
+    `;
+
+
+    row
+      .querySelector(".buy-btn")
+      .onclick = () => {
+
+        buyProduct(
+          item[0],
+          item[1]
+        );
+
+      };
+
+
+    box.appendChild(row);
+
+  });
+
+}
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
+
+renderProducts(
+  PUBG_UC,
+  "pubgHome"
+);
+
+renderProducts(
+  PUBG_UC,
+  "pubgPageList"
+);
+
+renderProducts(
+  MLBB_DIA,
+  "mlbbHome"
+);
+
+renderProducts(
+  MLBB_DIA,
+  "mlbbPageList"
+);
+
+renderProducts(
+  PREMIUM,
+  "premiumHome"
+);
+
+renderProducts(
+  PREMIUM,
+  "premiumPageList"
+);
+
+renderProducts(
+  STARS,
+  "starsHome"
+);
+
+renderProducts(
+  STARS,
+  "starsPageList"
+);
+
+
+/* =========================================================
+   BUY
+========================================================= */
+
+function buyProduct(
+  product,
+  price
+){
+
+  document.getElementById(
+    "orderProduct"
+  ).value = product;
+
+
+  document.getElementById(
+    "orderPrice"
+  ).value = price;
+
+
+  document.getElementById(
+    "playerId"
+  ).value = "";
+
+
+  document.getElementById(
+    "serverId"
+  ).value = "";
+
+
+  openPage(
+    "orderPage"
+  );
+
+}
+
+
+/* =========================================================
+   API POST
+========================================================= */
+
+async function apiPost(data){
+
+  const response =
+    await fetch(
+      API_URL,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body:
+          JSON.stringify(data)
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  try{
+
+    return JSON.parse(text);
+
+  }
+  catch(error){
+
+    console.error(
+      "API RESPONSE:",
+      text
+    );
+
+    throw new Error(
+      "Server returned invalid response."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SUBMIT ORDER
+========================================================= */
+
+async function submitOrder(){
+
+  const product =
+    document.getElementById(
+      "orderProduct"
+    ).value;
+
+
+  const price =
+    document.getElementById(
+      "orderPrice"
+    ).value;
+
+
+  const playerId =
+    document.getElementById(
+      "playerId"
+    ).value.trim();
+
+
+  const serverId =
+    document.getElementById(
+      "serverId"
+    ).value.trim();
+
+
+  const payment =
+    document.getElementById(
+      "payment"
+    ).value;
+
+
+  const user =
+    getUser();
+
+
+  if(!product){
+
+    return showModal(
+      "⚠️",
+      "Missing Product",
+      "Please select a product."
+    );
+
+  }
+
+
+  if(!playerId){
+
+    return showModal(
+      "⚠️",
+      "Missing Player ID",
+      "Enter your Player ID / Username."
+    );
+
+  }
+
+
+  if(!user){
+
+    return showModal(
+      "⚠️",
+      "Not Connected",
+      "Please open this shop from Telegram."
+    );
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "submitBtn"
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "⏳ CREATING...";
+
+
+  try{
+
+    const result =
+      await apiPost({
+
+        action:"createOrder",
+
+        telegramId:
+          String(user.id),
+
+        username:
+          user.username || "",
+
+        firstName:
+          user.first_name || "",
+
+        lastName:
+          user.last_name || "",
+
+        product,
+        price,
+        playerId,
+        serverId,
+        payment
+
+      });
+
+
+    if(result.success){
+
+      showModal(
+        "✅",
+        "Order Created!",
+        `
+          📦 Order ID:
+          <b>${escapeHTML(result.orderId)}</b>
+
+          <br><br>
+
+          ⏳ Status:
+          <b>PENDING</b>
+
+          <br><br>
+
+          👤 Please wait for admin confirmation.
+        `
+      );
+
+
+      openPage(
+        "ordersPage"
+      );
+
+
       loadMyOrders();
-    } else {
-      showModal("❌", "Order Failed", escapeHTML(result.error || "Unknown error"));
+
     }
-  } catch(e) {
-    showModal("❌", "Connection Error", escapeHTML(e.message));
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "🛒 CONFIRM ORDER";
+    else{
+
+      showModal(
+        "❌",
+        "Order Failed",
+        escapeHTML(
+          result.error ||
+          "Unknown error"
+        )
+      );
+
+    }
+
   }
+  catch(error){
+
+    showModal(
+      "❌",
+      "Connection Error",
+      escapeHTML(
+        error.message
+      )
+    );
+
+  }
+  finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "🛒 CONFIRM ORDER";
+
+  }
+
 }
 
-// ===== STATUS =====
-function normalizeStatus(s) {
-  const st = String(s || "PENDING").toUpperCase().trim();
-  if (["SUCCESS","COMPLETED","APPROVED","CONFIRMED"].includes(st)) return "SUCCESS";
-  if (["CANCELLED","CANCELED","REJECTED","FAILED"].includes(st)) return "CANCELLED";
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function normalizeStatus(status){
+
+  const value =
+    String(
+      status || "PENDING"
+    )
+    .toUpperCase()
+    .trim();
+
+
+  if([
+    "SUCCESS",
+    "COMPLETED",
+    "APPROVED",
+    "CONFIRMED"
+  ].includes(value)){
+
+    return "SUCCESS";
+
+  }
+
+
+  if([
+    "CANCELLED",
+    "CANCELED",
+    "REJECTED",
+    "FAILED"
+  ].includes(value)){
+
+    return "CANCELLED";
+
+  }
+
+
   return "PENDING";
+
 }
 
-function statusHTML(s) {
-  const st = normalizeStatus(s);
-  if (st === "SUCCESS") return `<span class="status success">✅ SUCCESS</span>`;
-  if (st === "CANCELLED") return `<span class="status cancelled">❌ CANCELLED</span>`;
-  return `<span class="status pending">⏳ PENDING</span>`;
-}
 
-// ===== MY ORDERS =====
-async function loadMyOrders() {
-  const box = document.getElementById("ordersList");
-  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Loading orders...</div></div>`;
-  const id = getTelegramId();
-  if (!id) return box.innerHTML = `<div class="empty">⚠️ Open from Telegram.</div>`;
+function statusHTML(status){
 
-  try {
-    const result = await apiPost({ action: "getOrders", telegramId: id });
-    const orders = result.orders || [];
-    if (!orders.length) return box.innerHTML = `<div class="empty">📦 No orders yet.</div>`;
+  const value =
+    normalizeStatus(status);
 
-    box.innerHTML = "";
-    orders.forEach(order => {
-      const status = normalizeStatus(order.status);
-      const card = document.createElement("div");
-      card.className = "order-card";
-      let msg = "";
-      if (status === "SUCCESS") msg = `<div class="order-message msg-success">🎉 Your order is completed!</div>`;
-      if (status === "CANCELLED") msg = `<div class="order-message msg-cancelled">❌ Order cancelled.</div>`;
-      card.innerHTML = `
-        <div class="order-top">
-          <div class="order-id">📦 ${escapeHTML(order.id || "-")}</div>
-          ${statusHTML(status)}
-        </div>
-        <div class="order-product">🎮 ${escapeHTML(order.product || "-")}</div>
-        <div class="order-price">💰 ${escapeHTML(order.price || "-")}</div>
-        <div class="order-info">🆔 Player: ${escapeHTML(order.playerId || order.player || "-")}</div>
-        <div class="order-info">🌐 Server: ${escapeHTML(order.serverId || order.server || "-")}</div>
-        <div class="order-info">💳 Payment: ${escapeHTML(order.payment || "-")}</div>
-        <div class="order-info">🕒 ${escapeHTML(order.createdAt || order.time || "-")}</div>
-        ${msg}
-      `;
-      box.appendChild(card);
-    });
-  } catch(e) {
-    box.innerHTML = `<div class="empty">❌ ${escapeHTML(e.message)}</div>`;
+
+  if(value === "SUCCESS"){
+
+    return `
+      <span class="status success">
+        ✅ SUCCESS
+      </span>
+    `;
+
   }
+
+
+  if(value === "CANCELLED"){
+
+    return `
+      <span class="status cancelled">
+        ❌ CANCELLED
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="status pending">
+      ⏳ PENDING
+    </span>
+  `;
+
 }
 
-// ===== ADMIN =====
-function openAdmin() {
-  if (!isAdmin()) return showModal("❌", "Access Denied", "You are not authorized.");
-  openPage("adminPage");
-  loadAdminOrders();
-}
 
-async function loadAdminOrders() {
-  if (!isAdmin()) return;
-  const box = document.getElementById("adminOrdersList");
-  box.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">Loading orders...</div></div>`;
+/* =========================================================
+   MY ORDERS
+========================================================= */
 
-  try {
-    const result = await apiPost({ action: "getAllOrders", adminId: getTelegramId() });
-    if (!result.success) throw new Error(result.error || "Unable to load");
-    const orders = result.orders || [];
-    if (!orders.length) return box.innerHTML = `<div class="empty">📦 No orders.</div>`;
+async function loadMyOrders(){
+
+  const box =
+    document.getElementById(
+      "ordersList"
+    );
+
+
+  box.innerHTML = `
+
+    <div class="loading">
+
+      <div class="spinner"></div>
+
+      <div class="loading-text">
+        Loading orders...
+      </div>
+
+    </div>
+
+  `;
+
+
+  const telegramId =
+    getTelegramId();
+
+
+  if(!telegramId){
+
+    box.innerHTML =
+      `<div class="empty">
+        ⚠️ Open from Telegram.
+      </div>`;
+
+    return;
+
+  }
+
+
+  try{
+
+    const result =
+      await apiPost({
+
+        action:"getOrders",
+
+        telegramId
+
+      });
+
+
+    const orders =
+      result.orders || [];
+
+
+    if(!orders.length){
+
+      box.innerHTML =
+        `<div class="empty">
+          📦 No orders yet.
+        </div>`;
+
+      return;
+
+    }
+
 
     box.innerHTML = "";
+
+
     orders.forEach(order => {
-      const status = normalizeStatus(order.status);
-      const card = document.createElement("div");
-      card.className = "admin-card";
-      let actions = "";
-      if (status === "PENDING") {
-        actions = `
-          <div class="admin-actions">
-            <button class="approve-btn" onclick="changeStatus('${safeJS(order.id)}','SUCCESS')">✅ APPROVE</button>
-            <button class="reject-btn" onclick="changeStatus('${safeJS(order.id)}','CANCELLED')">❌ CANCEL</button>
+
+      const status =
+        normalizeStatus(
+          order.status
+        );
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "order-card";
+
+
+      let message = "";
+
+
+      if(status === "SUCCESS"){
+
+        message = `
+          <div class="
+            order-message
+            msg-success
+          ">
+            🎉 Your order is completed!
           </div>
         `;
+
       }
+
+
+      if(status === "CANCELLED"){
+
+        message = `
+          <div class="
+            order-message
+            msg-cancelled
+          ">
+            ❌ Order cancelled.
+          </div>
+        `;
+
+      }
+
+
       card.innerHTML = `
+
         <div class="order-top">
-          <div class="order-id">📦 ${escapeHTML(order.id || "-")}</div>
+
+          <div class="order-id">
+            📦
+            ${escapeHTML(
+              order.id || "-"
+            )}
+          </div>
+
           ${statusHTML(status)}
+
         </div>
-        <div class="order-info">👤 Customer: @${escapeHTML(order.username || "-")}</div>
-        <div class="order-info">🆔 ID: ${escapeHTML(order.telegramId || "-")}</div>
-        <div class="order-product">🎮 ${escapeHTML(order.product || "-")}</div>
-        <div class="order-price">💰 ${escapeHTML(order.price || "-")}</div>
-        <div class="order-info">🎮 Player: ${escapeHTML(order.playerId || order.player || "-")}</div>
-        <div class="order-info">🌐 Server: ${escapeHTML(order.serverId || order.server || "-")}</div>
-        <div class="order-info">💳 Payment: ${escapeHTML(order.payment || "-")}</div>
-        <div class="order-info">🕒 ${escapeHTML(order.createdAt || "-")}</div>
-        ${actions}
+
+
+        <div class="order-product">
+          🎮
+          ${escapeHTML(
+            order.product || "-"
+          )}
+        </div>
+
+
+        <div class="order-price">
+          💰
+          ${escapeHTML(
+            order.price || "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🆔 Player:
+          ${escapeHTML(
+            order.playerId ||
+            order.player ||
+            "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🌐 Server:
+          ${escapeHTML(
+            order.serverId ||
+            order.server ||
+            "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          💳 Payment:
+          ${escapeHTML(
+            order.payment || "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🕒
+          ${escapeHTML(
+            order.createdAt ||
+            order.time ||
+            "-"
+          )}
+        </div>
+
+
+        ${message}
+
       `;
+
+
       box.appendChild(card);
+
     });
-  } catch(e) {
-    box.innerHTML = `<div class="empty">❌ ${escapeHTML(e.message)}</div>`;
+
   }
+  catch(error){
+
+    box.innerHTML = `
+      <div class="empty">
+        ❌
+        ${escapeHTML(
+          error.message
+        )}
+      </div>
+    `;
+
+  }
+
 }
 
-async function changeStatus(orderId, newStatus) {
-  if (!isAdmin()) return showModal("❌", "Access Denied", "Admin only.");
-  if (!confirm(newStatus === "SUCCESS" ? "Approve this order?" : "Cancel this order?")) return;
 
-  try {
-    const result = await apiPost({
-      action: "updateOrder",
-      orderId: orderId,
-      status: newStatus,
-      adminId: getTelegramId()
-    });
-    if (result.success) {
-      showModal(newStatus === "SUCCESS" ? "✅" : "❌", newStatus === "SUCCESS" ? "Approved!" : "Cancelled!", "Order updated.");
-      loadAdminOrders();
-    } else {
-      showModal("❌", "Failed", escapeHTML(result.error || "Unknown error"));
+/* =========================================================
+   ADMIN
+========================================================= */
+
+function openAdmin(){
+
+  if(!isAdmin()){
+
+    showModal(
+      "❌",
+      "Access Denied",
+      "You are not authorized."
+    );
+
+    return;
+
+  }
+
+
+  openPage(
+    "adminPage"
+  );
+
+
+  loadAdminOrders();
+
+}
+
+
+async function loadAdminOrders(){
+
+  if(!isAdmin()){
+
+    return;
+
+  }
+
+
+  const box =
+    document.getElementById(
+      "adminOrdersList"
+    );
+
+
+  box.innerHTML = `
+
+    <div class="loading">
+
+      <div class="spinner"></div>
+
+      <div class="loading-text">
+        Loading orders...
+      </div>
+
+    </div>
+
+  `;
+
+
+  try{
+
+    const result =
+      await apiPost({
+
+        action:"getAllOrders",
+
+        adminId:
+          getTelegramId()
+
+      });
+
+
+    if(!result.success){
+
+      throw new Error(
+        result.error ||
+        "Unable to load orders."
+      );
+
     }
-  } catch(e) {
-    showModal("❌", "Error", escapeHTML(e.message));
+
+
+    const orders =
+      result.orders || [];
+
+
+    if(!orders.length){
+
+      box.innerHTML =
+        `<div class="empty">
+          📦 No orders.
+        </div>`;
+
+      return;
+
+    }
+
+
+    box.innerHTML = "";
+
+
+    orders.forEach(order => {
+
+      const status =
+        normalizeStatus(
+          order.status
+        );
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "admin-card";
+
+
+      let actions = "";
+
+
+      if(status === "PENDING"){
+
+        actions = `
+
+          <div class="admin-actions">
+
+            <button
+              class="approve-btn"
+              onclick="
+                changeStatus(
+                  '${safeJS(order.id)}',
+                  'SUCCESS'
+                )
+              ">
+
+              ✅ APPROVE
+
+            </button>
+
+
+            <button
+              class="reject-btn"
+              onclick="
+                changeStatus(
+                  '${safeJS(order.id)}',
+                  'CANCELLED'
+                )
+              ">
+
+              ❌ CANCEL
+
+            </button>
+
+          </div>
+
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        <div class="order-top">
+
+          <div class="order-id">
+            📦
+            ${escapeHTML(
+              order.id || "-"
+            )}
+          </div>
+
+          ${statusHTML(status)}
+
+        </div>
+
+
+        <div class="order-info">
+          👤 Customer:
+          @${escapeHTML(
+            order.username || "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🆔 ID:
+          ${escapeHTML(
+            order.telegramId || "-"
+          )}
+        </div>
+
+
+        <div class="order-product">
+          🎮
+          ${escapeHTML(
+            order.product || "-"
+          )}
+        </div>
+
+
+        <div class="order-price">
+          💰
+          ${escapeHTML(
+            order.price || "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🎮 Player:
+          ${escapeHTML(
+            order.playerId ||
+            order.player ||
+            "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🌐 Server:
+          ${escapeHTML(
+            order.serverId ||
+            order.server ||
+            "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          💳 Payment:
+          ${escapeHTML(
+            order.payment || "-"
+          )}
+        </div>
+
+
+        <div class="order-info">
+          🕒
+          ${escapeHTML(
+            order.createdAt || "-"
+          )}
+        </div>
+
+
+        ${actions}
+
+      `;
+
+
+      box.appendChild(card);
+
+    });
+
   }
-}
+  catch(error){
 
-// ===== PROFILE =====
-function openProfile() {
-  openPage("profilePage");
-  const user = getUser();
-  if (!user) return;
-  const name = (user.first_name || "") + " " + (user.last_name || "");
-  document.getElementById("profileName").textContent = name.trim() || "Telegram User";
-  document.getElementById("profileUsername").textContent = user.username ? "@" + user.username : "No username";
-  if (user.photo_url) {
-    document.getElementById("profileImage").src = user.photo_url;
-    document.getElementById("headerAvatar").src = user.photo_url;
+    box.innerHTML = `
+      <div class="empty">
+        ❌
+        ${escapeHTML(
+          error.message
+        )}
+      </div>
+    `;
+
   }
-  document.getElementById("adminAccess").style.display = isAdmin() ? "block" : "none";
+
 }
 
-// ===== COMING SOON =====
-function comingSoon(name) {
-  showModal("🚀", "Coming Soon!", `${escapeHTML(name)} is coming soon. Stay tuned!`);
+
+/* =========================================================
+   CHANGE ORDER STATUS
+========================================================= */
+
+async function changeStatus(
+  orderId,
+  newStatus
+){
+
+  if(!isAdmin()){
+
+    showModal(
+      "❌",
+      "Access Denied",
+      "Admin only."
+    );
+
+    return;
+
+  }
+
+
+  const message =
+    newStatus === "SUCCESS"
+      ? "Approve this order?"
+      : "Cancel this order?";
+
+
+  if(!confirm(message)){
+
+    return;
+
+  }
+
+
+  try{
+
+    const result =
+      await apiPost({
+
+        action:"updateOrder",
+
+        orderId,
+
+        status:newStatus,
+
+        adminId:
+          getTelegramId()
+
+      });
+
+
+    if(result.success){
+
+      showModal(
+        newStatus === "SUCCESS"
+          ? "✅"
+          : "❌",
+
+        newStatus === "SUCCESS"
+          ? "Approved!"
+          : "Cancelled!",
+
+        "Order updated successfully."
+      );
+
+
+      loadAdminOrders();
+
+    }
+    else{
+
+      showModal(
+        "❌",
+        "Failed",
+        escapeHTML(
+          result.error ||
+          "Unknown error"
+        )
+      );
+
+    }
+
+  }
+  catch(error){
+
+    showModal(
+      "❌",
+      "Error",
+      escapeHTML(
+        error.message
+      )
+    );
+
+  }
+
 }
 
-// ===== AUTO REFRESH =====
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function openProfile(){
+
+  openPage(
+    "profilePage"
+  );
+
+
+  const user =
+    getUser();
+
+
+  if(!user){
+
+    return;
+
+  }
+
+
+  const name =
+    (
+      user.first_name || ""
+    )
+    +
+    " "
+    +
+    (
+      user.last_name || ""
+    );
+
+
+  document.getElementById(
+    "profileName"
+  ).textContent =
+    name.trim() ||
+    "Telegram User";
+
+
+  document.getElementById(
+    "profileUsername"
+  ).textContent =
+    user.username
+      ? "@" + user.username
+      : "No username";
+
+
+  if(user.photo_url){
+
+    document.getElementById(
+      "profileImage"
+    ).src =
+      user.photo_url;
+
+
+    document.getElementById(
+      "headerAvatar"
+    ).src =
+      user.photo_url;
+
+  }
+
+
+  document.getElementById(
+    "adminAccess"
+  ).style.display =
+    isAdmin()
+      ? "block"
+      : "none";
+
+}
+
+
+/* =========================================================
+   INITIAL PROFILE
+========================================================= */
+
+function initializeUser(){
+
+  const user =
+    getUser();
+
+
+  if(!user){
+
+    return;
+
+  }
+
+
+  if(user.photo_url){
+
+    document.getElementById(
+      "profileImage"
+    ).src =
+      user.photo_url;
+
+
+    document.getElementById(
+      "headerAvatar"
+    ).src =
+      user.photo_url;
+
+  }
+
+}
+
+
+setTimeout(
+  initializeUser,
+  300
+);
+
+
+/* =========================================================
+   AUTO REFRESH USER ORDERS
+========================================================= */
+
 setInterval(() => {
-  const ordersPage = document.getElementById("ordersPage");
-  if (ordersPage?.classList.contains("active")) loadMyOrders();
-}, 10000);
+
+  const page =
+    document.getElementById(
+      "ordersPage"
+    );
+
+
+  if(
+    page &&
+    page.classList.contains("active")
+  ){
+
+    loadMyOrders();
+
+  }
+
+},10000);
+
+
+/* =========================================================
+   AUTO REFRESH ADMIN
+========================================================= */
 
 setInterval(() => {
-  const adminPage = document.getElementById("adminPage");
-  if (adminPage?.classList.contains("active") && isAdmin()) loadAdminOrders();
-}, 10000);
 
-// ===== PROFILE ON START =====
-setTimeout(() => {
-  const user = getUser();
-  if (user?.photo_url) {
-    document.getElementById("profileImage").src = user.photo_url;
-    document.getElementById("headerAvatar").src = user.photo_url;
+  const page =
+    document.getElementById(
+      "adminPage"
+    );
+
+
+  if(
+    page &&
+    page.classList.contains("active") &&
+    isAdmin()
+  ){
+
+    loadAdminOrders();
+
   }
-}, 500);
+
+},10000);
+
+
+/* =========================================================
+   TELEGRAM BACK BUTTON
+========================================================= */
+
+if(
+  tg &&
+  tg.BackButton
+){
+
+  tg.BackButton.onClick(() => {
+
+    const pages =
+      document.querySelectorAll(
+        ".page"
+      );
+
+
+    let activePage = null;
+
+
+    pages.forEach(page => {
+
+      if(
+        page.classList.contains(
+          "active"
+        )
+      ){
+
+        activePage = page.id;
+
+      }
+
+    });
+
+
+    if(
+      activePage &&
+      activePage !== "homePage"
+    ){
+
+      openPage(
+        "homePage"
+      );
+
+      tg.BackButton.hide();
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   UPDATE TELEGRAM BACK BUTTON
+========================================================= */
+
+function updateBackButton(){
+
+  if(!tg || !tg.BackButton){
+
+    return;
+
+  }
+
+
+  const active =
+    document.querySelector(
+      ".page.active"
+    );
+
+
+  if(
+    active &&
+    active.id !== "homePage"
+  ){
+
+    tg.BackButton.show();
+
+  }
+  else{
+
+    tg.BackButton.hide();
+
+  }
+
+}
+
+
+/* =========================================================
+   PAGE OBSERVER
+========================================================= */
+
+const pageObserver =
+  new MutationObserver(() => {
+
+    updateBackButton();
+
+  });
+
+
+pageObserver.observe(
+  document.body,
+  {
+    subtree:true,
+    attributes:true,
+    attributeFilter:[
+      "class"
+    ]
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+openPage(
+  "homePage"
+);
+
+updateBackButton();
 
 </script>
+
 </body>
 </html>
