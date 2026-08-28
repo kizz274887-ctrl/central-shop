@@ -1,608 +1,15 @@
-const SPREADSHEET_ID = ""; 
-// Spreadsheet ID မထည့်ထားရင် Script နဲ့ချိတ်ထားတဲ့ Spreadsheet ကိုသုံးမယ်။
-
-const SHEET_NAME = "Orders";
-
-// Admin password
-// ကိုယ်ပိုင် password တစ်ခု ပြောင်းထည့်ပါ။
-const ADMIN_KEY = "CENTRAL_ADMIN_2026";
-
-
-function getSheet() {
-
-  let ss;
-
-  if (SPREADSHEET_ID) {
-    ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  } else {
-    ss = SpreadsheetApp.getActiveSpreadsheet();
-  }
-
-  let sheet = ss.getSheetByName(SHEET_NAME);
-
-  if (!sheet) {
-
-    sheet = ss.insertSheet(SHEET_NAME);
-
-    sheet.appendRow([
-      "Order ID",
-      "Telegram ID",
-      "Username",
-      "Product",
-      "Price",
-      "Player ID",
-      "Server ID",
-      "Payment",
-      "Status",
-      "Created At",
-      "Updated At"
-    ]);
-
-  }
-
-  return sheet;
-}
-
-
-/*************************************************
- * WEB APP
- *************************************************/
-
-function doGet(e) {
-
-  const action =
-    e && e.parameter
-      ? e.parameter.action
-      : "";
-
-  if (action === "getOrder") {
-
-    return jsonOutput(
-      getOrder(
-        e.parameter.orderId,
-        e.parameter.telegramId
-      )
-    );
-
-  }
-
-  if (action === "getOrders") {
-
-    return jsonOutput(
-      getAllOrders(
-        e.parameter.key
-      )
-    );
-
-  }
-
-  if (action === "updateStatus") {
-
-    return jsonOutput(
-      updateOrderStatus(
-        e.parameter.key,
-        e.parameter.orderId,
-        e.parameter.status
-      )
-    );
-
-  }
-
-  if (action === "admin") {
-
-    return HtmlService
-      .createTemplateFromFile("Admin")
-      .evaluate()
-      .setTitle("Central Shop Admin")
-      .setXFrameOptionsMode(
-        HtmlService.XFrameOptionsMode.ALLOWALL
-      );
-
-  }
-
-  return HtmlService
-    .createTemplateFromFile("Index")
-    .evaluate()
-    .setTitle("Central Shop")
-    .setXFrameOptionsMode(
-      HtmlService.XFrameOptionsMode.ALLOWALL
-    );
-
-}
-
-
-/*************************************************
- * POST
- *************************************************/
-
-function doPost(e) {
-
-  try {
-
-    const data =
-      JSON.parse(
-        e.postData.contents
-      );
-
-    if (
-      data.action === "createOrder"
-    ) {
-
-      return jsonOutput(
-        createOrder(data)
-      );
-
-    }
-
-    if (
-      data.action === "updateStatus"
-    ) {
-
-      return jsonOutput(
-        updateOrderStatus(
-          data.key,
-          data.orderId,
-          data.status
-        )
-      );
-
-    }
-
-    return jsonOutput({
-      success: false,
-      error: "Unknown action"
-    });
-
-  } catch (err) {
-
-    return jsonOutput({
-      success: false,
-      error: err.toString()
-    });
-
-  }
-
-}
-
-
-/*************************************************
- * CREATE ORDER
- *************************************************/
-
-function createOrder(data) {
-
-  if (!data.telegramId) {
-
-    return {
-      success: false,
-      error: "Telegram ID missing"
-    };
-
-  }
-
-  if (!data.product) {
-
-    return {
-      success: false,
-      error: "Product missing"
-    };
-
-  }
-
-  if (!data.price) {
-
-    return {
-      success: false,
-      error: "Price missing"
-    };
-
-  }
-
-  if (!data.playerId) {
-
-    return {
-      success: false,
-      error: "Player ID missing"
-    };
-
-  }
-
-
-  const sheet = getSheet();
-
-  const orderId =
-    "CS" +
-    Date.now();
-
-
-  const now =
-    new Date();
-
-
-  sheet.appendRow([
-
-    orderId,
-
-    String(
-      data.telegramId
-    ),
-
-    data.username || "",
-
-    data.product,
-
-    data.price,
-
-    data.playerId,
-
-    data.serverId || "",
-
-    data.payment || "Manual Payment",
-
-    "PENDING",
-
-    now,
-
-    now
-
-  ]);
-
-
-  return {
-
-    success: true,
-
-    orderId: orderId,
-
-    status: "PENDING"
-
-  };
-
-}
-
-
-/*************************************************
- * GET ONE ORDER
- *************************************************/
-
-function getOrder(
-  orderId,
-  telegramId
-) {
-
-  if (!orderId) {
-
-    return {
-      success: false,
-      error: "Order ID missing"
-    };
-
-  }
-
-
-  const sheet = getSheet();
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    if (
-      String(row[0]) ===
-      String(orderId)
-    ) {
-
-
-      if (
-        telegramId &&
-        String(row[1]) !==
-        String(telegramId)
-      ) {
-
-        return {
-          success: false,
-          error: "Unauthorized"
-        };
-
-      }
-
-
-      return {
-
-        success: true,
-
-        order: {
-
-          id: row[0],
-
-          telegramId:
-            String(row[1]),
-
-          username:
-            row[2],
-
-          product:
-            row[3],
-
-          price:
-            row[4],
-
-          player:
-            row[5],
-
-          server:
-            row[6],
-
-          payment:
-            row[7],
-
-          status:
-            row[8],
-
-          createdAt:
-            row[9],
-
-          updatedAt:
-            row[10]
-
-        }
-
-      };
-
-    }
-
-  }
-
-
-  return {
-
-    success: false,
-
-    error: "Order not found"
-
-  };
-
-}
-
-
-/*************************************************
- * GET ALL ORDERS FOR ADMIN
- *************************************************/
-
-function getAllOrders(key) {
-
-  if (key !== ADMIN_KEY) {
-
-    return {
-
-      success: false,
-
-      error: "Invalid admin key"
-
-    };
-
-  }
-
-
-  const sheet = getSheet();
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  const orders = [];
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    orders.push({
-
-      id: row[0],
-
-      telegramId:
-        String(row[1]),
-
-      username:
-        row[2],
-
-      product:
-        row[3],
-
-      price:
-        row[4],
-
-      player:
-        row[5],
-
-      server:
-        row[6],
-
-      payment:
-        row[7],
-
-      status:
-        row[8],
-
-      createdAt:
-        row[9],
-
-      updatedAt:
-        row[10],
-
-      rowNumber:
-        i + 1
-
-    });
-
-  }
-
-
-  orders.reverse();
-
-
-  return {
-
-    success: true,
-
-    orders: orders
-
-  };
-
-}
-
-
-/*************************************************
- * UPDATE STATUS
- *************************************************/
-
-function updateOrderStatus(
-  key,
-  orderId,
-  status
-) {
-
-  if (key !== ADMIN_KEY) {
-
-    return {
-
-      success: false,
-
-      error: "Invalid admin key"
-
-    };
-
-  }
-
-
-  if (
-    status !== "SUCCESS" &&
-    status !== "CANCELLED"
-  ) {
-
-    return {
-
-      success: false,
-
-      error: "Invalid status"
-
-    };
-
-  }
-
-
-  const sheet = getSheet();
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    if (
-      String(values[i][0]) ===
-      String(orderId)
-    ) {
-
-      const row =
-        i + 1;
-
-
-      // Status column = I
-      sheet
-        .getRange(row, 9)
-        .setValue(status);
-
-
-      // Updated At = K
-      sheet
-        .getRange(row, 11)
-        .setValue(
-          new Date()
-        );
-
-
-      return {
-
-        success: true,
-
-        orderId:
-          orderId,
-
-        status:
-          status
-
-      };
-
-    }
-
-  }
-
-
-  return {
-
-    success: false,
-
-    error: "Order not found"
-
-  };
-
-}
-
-
-/*************************************************
- * JSON
- *************************************************/
-
-function jsonOutput(data) {
-
-  return ContentService
-
-    .createTextOutput(
-      JSON.stringify(data)
-    )
-
-    .setMimeType(
-      ContentService.MimeType.JSON
-    );
-
-}
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
 
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
 
 <title>Central Shop</title>
 
@@ -613,6 +20,10 @@ content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no
 *{
 box-sizing:border-box;
 -webkit-tap-highlight-color:transparent;
+}
+
+html{
+scroll-behavior:smooth;
 }
 
 body{
@@ -641,9 +52,16 @@ padding-bottom:100px;
 button,
 input,
 select{
-
 font-family:inherit;
+}
 
+button{
+cursor:pointer;
+}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
 }
 
 .app{
@@ -656,14 +74,16 @@ padding:12px;
 }
 
 
-/* HEADER */
+/* =========================
+HEADER
+========================= */
 
 .top-header{
 
 min-height:92px;
 
-border:
-1px solid rgba(255,255,255,.12);
+border:1px solid
+rgba(255,255,255,.12);
 
 border-radius:24px;
 
@@ -675,12 +95,18 @@ rgba(10,10,16,.95)
 );
 
 display:flex;
+
 align-items:center;
+
 justify-content:space-between;
 
 padding:12px 15px;
 
 margin-bottom:12px;
+
+box-shadow:
+0 0 30px
+rgba(255,0,55,.12);
 
 }
 
@@ -693,15 +119,11 @@ gap:10px;
 }
 
 .crown{
-
 font-size:28px;
-
 }
 
 .brand{
-
 line-height:.9;
-
 }
 
 .central{
@@ -749,23 +171,26 @@ border:2px solid #ff1744;
 
 }
 
+.profile-mini span{
 
-/* HERO */
+font-size:10px;
+font-weight:bold;
+
+}
+
+
+/* =========================
+HERO
+========================= */
 
 .hero{
 
 position:relative;
 overflow:hidden;
-
 min-height:250px;
-
 border-radius:25px;
-
-border:
-1px solid rgba(255,255,255,.13);
-
+border:1px solid rgba(255,255,255,.13);
 margin-bottom:15px;
-
 background:#090909;
 
 }
@@ -774,12 +199,9 @@ background:#090909;
 
 position:absolute;
 inset:0;
-
 width:100%;
 height:100%;
-
 object-fit:cover;
-
 opacity:.35;
 
 }
@@ -803,9 +225,7 @@ rgba(0,0,0,.88)
 
 position:relative;
 z-index:2;
-
 min-height:250px;
-
 padding:18px;
 
 }
@@ -820,9 +240,7 @@ font-style:italic;
 }
 
 .hero-title span{
-
 color:#ff1744;
-
 }
 
 .hero-sub{
@@ -838,24 +256,22 @@ margin-top:8px;
 position:absolute;
 top:17px;
 right:15px;
-
 text-align:right;
-
 font-size:9px;
 font-weight:bold;
 
 }
 
 .support strong{
-
 color:#ff1744;
-
 }
+
+
+/* GIF */
 
 .gif-box{
 
 position:absolute;
-
 left:50%;
 top:58%;
 
@@ -866,7 +282,6 @@ width:130px;
 height:130px;
 
 border-radius:50%;
-
 overflow:hidden;
 
 border:3px solid #ff1744;
@@ -888,7 +303,9 @@ object-fit:cover;
 }
 
 
-/* MENU */
+/* =========================
+QUICK MENU
+========================= */
 
 .quick-menu{
 
@@ -913,8 +330,8 @@ border-radius:16px;
 
 text-align:center;
 
-border:
-1px solid rgba(255,255,255,.10);
+border:1px solid
+rgba(255,255,255,.10);
 
 background:
 linear-gradient(
@@ -928,9 +345,7 @@ cursor:pointer;
 }
 
 .quick:active{
-
 transform:scale(.94);
-
 }
 
 .quick-icon{
@@ -976,7 +391,9 @@ border-color:#18d66b;
 }
 
 
-/* SECTION */
+/* =========================
+SECTION
+========================= */
 
 .section-title{
 
@@ -984,8 +401,7 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 
-margin:
-18px 3px 10px;
+margin:18px 3px 10px;
 
 }
 
@@ -997,7 +413,9 @@ font-size:16px;
 }
 
 
-/* PRICE */
+/* =========================
+PRICE CARD
+========================= */
 
 .price-card{
 
@@ -1008,8 +426,8 @@ rgba(255,255,255,.06),
 rgba(0,0,0,.4)
 );
 
-border:
-1px solid rgba(255,255,255,.12);
+border:1px solid
+rgba(255,255,255,.12);
 
 border-radius:20px;
 
@@ -1020,15 +438,18 @@ margin-bottom:12px;
 }
 
 .price-card.uc{
-border-color:rgba(255,150,0,.45);
+border-color:
+rgba(255,150,0,.45);
 }
 
 .price-card.premium{
-border-color:rgba(150,50,255,.45);
+border-color:
+rgba(150,50,255,.45);
 }
 
 .price-card.dia{
-border-color:rgba(0,140,255,.45);
+border-color:
+rgba(0,140,255,.45);
 }
 
 .price-head{
@@ -1065,7 +486,8 @@ gap:7px;
 padding:10px 4px;
 
 border-bottom:
-1px solid rgba(255,255,255,.05);
+1px solid
+rgba(255,255,255,.05);
 
 }
 
@@ -1107,7 +529,9 @@ font-weight:1000;
 }
 
 
-/* PAGE */
+/* =========================
+PAGE
+========================= */
 
 .page{
 display:none;
@@ -1120,26 +544,25 @@ display:block;
 .back{
 
 display:inline-block;
-
 margin-bottom:14px;
 
 color:#aaa;
-
 font-size:12px;
-
 cursor:pointer;
 
 }
 
 
-/* FORM */
+/* =========================
+FORM
+========================= */
 
 .form-box{
 
 background:#11151d;
 
-border:
-1px solid rgba(255,255,255,.1);
+border:1px solid
+rgba(255,255,255,.1);
 
 border-radius:20px;
 
@@ -1155,7 +578,8 @@ color:#aaa;
 
 font-size:11px;
 
-margin:10px 0 6px;
+margin:
+10px 0 6px;
 
 }
 
@@ -1166,8 +590,7 @@ width:100%;
 
 padding:13px;
 
-border:
-1px solid #2a3342;
+border:1px solid #2a3342;
 
 border-radius:12px;
 
@@ -1206,7 +629,9 @@ font-weight:1000;
 }
 
 
-/* ORDER */
+/* =========================
+ORDER CARD
+========================= */
 
 .order-card{
 
@@ -1217,8 +642,8 @@ linear-gradient(
 #0c0f15
 );
 
-border:
-1px solid rgba(255,255,255,.09);
+border:1px solid
+rgba(255,255,255,.09);
 
 border-radius:18px;
 
@@ -1241,29 +666,175 @@ font-weight:bold;
 
 }
 
-.status-PENDING{
+.status-pending{
 
-background:#5d4700;
-color:#ffd740;
+background:
+rgba(255,193,7,.15);
 
-}
+color:#ffc107;
 
-.status-SUCCESS{
-
-background:#064f2b;
-color:#35ff9a;
+border:1px solid
+rgba(255,193,7,.25);
 
 }
 
-.status-CANCELLED{
+.status-success{
 
-background:#5a1018;
-color:#ff6675;
+background:
+rgba(24,214,107,.15);
+
+color:#18d66b;
+
+border:1px solid
+rgba(24,214,107,.30);
+
+}
+
+.status-cancelled{
+
+background:
+rgba(255,23,68,.15);
+
+color:#ff1744;
+
+border:1px solid
+rgba(255,23,68,.30);
 
 }
 
 
-/* TRUST */
+/* =========================
+ADMIN BUTTONS
+========================= */
+
+.admin-actions{
+
+display:grid;
+
+grid-template-columns:
+1fr 1fr;
+
+gap:8px;
+
+margin-top:12px;
+
+}
+
+.approve-btn{
+
+border:0;
+
+border-radius:11px;
+
+padding:12px;
+
+background:
+linear-gradient(
+135deg,
+#18d66b,
+#079447
+);
+
+color:#fff;
+
+font-weight:1000;
+
+font-size:11px;
+
+}
+
+.cancel-btn{
+
+border:0;
+
+border-radius:11px;
+
+padding:12px;
+
+background:
+linear-gradient(
+135deg,
+#ff1744,
+#a80028
+);
+
+color:#fff;
+
+font-weight:1000;
+
+font-size:11px;
+
+}
+
+
+/* =========================
+ADMIN PANEL
+========================= */
+
+.admin-badge{
+
+display:inline-block;
+
+padding:6px 10px;
+
+border-radius:9px;
+
+background:
+rgba(255,23,68,.12);
+
+color:#ff1744;
+
+font-size:10px;
+
+font-weight:1000;
+
+margin-bottom:10px;
+
+}
+
+.refresh-btn{
+
+border:1px solid
+rgba(255,255,255,.12);
+
+background:#11151d;
+
+color:white;
+
+border-radius:10px;
+
+padding:8px 12px;
+
+font-size:10px;
+
+font-weight:bold;
+
+}
+
+.admin-order{
+
+border:1px solid
+rgba(255,255,255,.08);
+
+border-radius:18px;
+
+padding:14px;
+
+margin-bottom:10px;
+
+background:
+linear-gradient(
+145deg,
+#171c26,
+#0b0e14
+);
+
+}
+
+
+/* =========================
+TRUST
+========================= */
 
 .trust{
 
@@ -1289,15 +860,13 @@ border-radius:15px;
 background:
 rgba(255,255,255,.04);
 
-border:
-1px solid rgba(255,255,255,.08);
+border:1px solid
+rgba(255,255,255,.08);
 
 }
 
 .trust-item div{
-
 font-size:21px;
-
 }
 
 .trust-item span{
@@ -1313,7 +882,9 @@ margin-top:6px;
 }
 
 
-/* NAV */
+/* =========================
+BOTTOM NAV
+========================= */
 
 .bottom-nav{
 
@@ -1340,10 +911,11 @@ border-radius:22px;
 background:
 rgba(8,10,15,.96);
 
-backdrop-filter:blur(20px);
+backdrop-filter:
+blur(20px);
 
-border:
-1px solid rgba(255,255,255,.13);
+border:1px solid
+rgba(255,255,255,.13);
 
 display:grid;
 
@@ -1357,9 +929,11 @@ padding:5px;
 .nav-item{
 
 display:flex;
+
 flex-direction:column;
 
 align-items:center;
+
 justify-content:center;
 
 gap:4px;
@@ -1367,6 +941,7 @@ gap:4px;
 color:#777;
 
 font-size:7px;
+
 font-weight:900;
 
 cursor:pointer;
@@ -1376,9 +951,7 @@ border-radius:15px;
 }
 
 .nav-icon{
-
 font-size:19px;
-
 }
 
 .nav-item.active{
@@ -1390,6 +963,39 @@ rgba(255,0,50,.10);
 
 }
 
+
+/* =========================
+LOADING
+========================= */
+
+.loading{
+
+text-align:center;
+
+padding:25px;
+
+color:#777;
+
+font-size:11px;
+
+}
+
+.empty{
+
+text-align:center;
+
+padding:25px;
+
+color:#777;
+
+font-size:11px;
+
+}
+
+
+/* =========================
+MOBILE
+========================= */
 
 @media(max-width:430px){
 
@@ -1410,8 +1016,10 @@ font-size:20px;
 }
 
 .profile-mini img{
+
 width:44px;
 height:44px;
+
 }
 
 .hero-title{
@@ -1431,7 +1039,9 @@ font-size:29px;
 <div class="app">
 
 
-<!-- HOME -->
+<!-- =========================
+HOME
+========================= -->
 
 <div id="homePage" class="page active">
 
@@ -1479,6 +1089,8 @@ Back!
 
 </div>
 
+
+<!-- HERO -->
 
 <div class="hero">
 
@@ -1531,6 +1143,8 @@ src="https://media0.giphy.com/media/Q1m9xj4vqwSDRMZDrR/giphy.gif">
 
 </div>
 
+
+<!-- QUICK MENU -->
 
 <div class="quick-menu">
 
@@ -1629,8 +1243,11 @@ ORDERS
 
 </div>
 
+
 </div>
 
+
+<!-- UC -->
 
 <div class="section-title">
 
@@ -1652,6 +1269,8 @@ ORDERS
 </div>
 
 
+<!-- PREMIUM -->
+
 <div class="section-title">
 
 <h2>
@@ -1671,6 +1290,8 @@ ORDERS
 
 </div>
 
+
+<!-- DIA -->
 
 <div class="section-title">
 
@@ -1695,27 +1316,46 @@ ORDERS
 <div class="trust">
 
 <div class="trust-item">
+
 <div>🛡️</div>
-<span>SAFE SERVICE</span>
+
+<span>
+SAFE SERVICE
+</span>
+
 </div>
 
+
 <div class="trust-item">
+
 <div>⚡</div>
-<span>FAST DELIVERY</span>
+
+<span>
+FAST DELIVERY
+</span>
+
 </div>
+
 
 <div class="trust-item">
+
 <div>💯</div>
-<span>TRUSTED SHOP</span>
-</div>
+
+<span>
+TRUSTED SHOP
+</span>
 
 </div>
 
+</div>
+
 
 </div>
 
 
-<!-- UC -->
+<!-- =========================
+UC PAGE
+========================= -->
 
 <div id="ucPage" class="page">
 
@@ -1740,7 +1380,9 @@ onclick="openPage('homePage')">
 </div>
 
 
-<!-- PREMIUM -->
+<!-- =========================
+PREMIUM PAGE
+========================= -->
 
 <div id="premiumPage" class="page">
 
@@ -1761,7 +1403,9 @@ onclick="openPage('homePage')">
 </div>
 
 
-<!-- DIAMONDS -->
+<!-- =========================
+DIA PAGE
+========================= -->
 
 <div id="diaPage" class="page">
 
@@ -1782,7 +1426,9 @@ onclick="openPage('homePage')">
 </div>
 
 
-<!-- ORDER -->
+<!-- =========================
+ORDER PAGE
+========================= -->
 
 <div id="orderPage" class="page">
 
@@ -1800,6 +1446,7 @@ onclick="openPage('homePage')">
 
 
 <div class="form-box">
+
 
 <label>
 Product
@@ -1871,12 +1518,15 @@ onclick="submitOrder()">
 
 </button>
 
-</div>
 
 </div>
 
+</div>
 
-<!-- ORDERS -->
+
+<!-- =========================
+MY ORDERS
+========================= -->
 
 <div id="ordersPage" class="page">
 
@@ -1892,12 +1542,31 @@ onclick="openPage('homePage')">
 📦 My Orders
 </h2>
 
+<div
+style="
+display:flex;
+justify-content:flex-end;
+margin-bottom:10px;
+">
+
+<button
+class="refresh-btn"
+onclick="loadMyOrders()">
+
+🔄 Refresh
+
+</button>
+
+</div>
+
 <div id="ordersList"></div>
 
 </div>
 
 
-<!-- PROFILE -->
+<!-- =========================
+PROFILE
+========================= -->
 
 <div id="profilePage" class="page">
 
@@ -1955,10 +1624,60 @@ Welcome to Central Shop
 </div>
 
 
+<!-- =========================
+ADMIN PAGE
+========================= -->
+
+<div id="adminPage" class="page">
+
+<div
+class="back"
+onclick="openPage('homePage')">
+
+← Back
+
 </div>
 
 
-<!-- NAV -->
+<div class="admin-badge">
+🛡️ ADMIN PANEL
+</div>
+
+
+<div
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+">
+
+<h2 style="margin:0">
+📦 Orders
+</h2>
+
+<button
+class="refresh-btn"
+onclick="loadAdminOrders()">
+
+🔄 Refresh
+
+</button>
+
+</div>
+
+
+<div id="adminOrdersList"></div>
+
+</div>
+
+
+</div>
+
+
+<!-- =========================
+BOTTOM NAV
+========================= -->
 
 <div class="bottom-nav">
 
@@ -2060,31 +1779,49 @@ PROFILE
 <script>
 
 
-/*************************************************
- * TELEGRAM
- *************************************************/
+/* ==========================================
+TELEGRAM
+========================================== */
 
 const tg =
 window.Telegram.WebApp;
 
 tg.ready();
+
 tg.expand();
 
 
-/*************************************************
- * IMPORTANT
- *************************************************
- * Apps Script URL ကို DEPLOY ပြီးရတဲ့
- * /exec URL နဲ့ ပြောင်းပါ။
- *************************************************/
+/* ==========================================
+GOOGLE APPS SCRIPT
+========================================== */
 
 const APPS_SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbzVXG7SdqEnr0lhHKhRQWM5EUK40xfhbaAagGUrrUjgR7QfxFGBELg4cqP1om8bs6ve/exec";
 
 
-/*************************************************
- * PRICE DATA
- *************************************************/
+/* ==========================================
+ADMIN TELEGRAM IDS
+
+ထည့်ထားတဲ့ Telegram ID တွေက
+Admin Panel ကိုမြင်ရမယ့်သူတွေပါ။
+
+ဥပမာ:
+
+const ADMIN_IDS = [
+"123456789",
+"987654321"
+];
+
+========================================== */
+
+const ADMIN_IDS = [
+"8758413326"
+];
+
+
+/* ==========================================
+PRICE DATA
+========================================== */
 
 const UC = [
 
@@ -2139,9 +1876,52 @@ const DIAMONDS = [
 ];
 
 
-/*************************************************
- * RENDER
- *************************************************/
+/* ==========================================
+HELPERS
+========================================== */
+
+function getTelegramUser(){
+
+const user =
+tg.initDataUnsafe &&
+tg.initDataUnsafe.user
+?
+tg.initDataUnsafe.user
+:
+null;
+
+return user;
+
+}
+
+
+function getTelegramId(){
+
+const user =
+getTelegramUser();
+
+return user
+?
+String(user.id)
+:
+"";
+
+}
+
+
+function isAdmin(){
+
+const id =
+getTelegramId();
+
+return ADMIN_IDS.includes(id);
+
+}
+
+
+/* ==========================================
+RENDER PRICE
+========================================== */
 
 function renderList(
 data,
@@ -2153,26 +1933,22 @@ document.getElementById(
 elementId
 );
 
-if(!el)return;
+if(!el) return;
 
-el.innerHTML="";
+el.innerHTML = "";
 
 
-data.forEach(item=>{
+data.forEach(item => {
 
 const row =
-document.createElement(
-"div"
-);
+document.createElement("div");
 
 row.className =
 "price-row";
 
 
 const name =
-document.createElement(
-"div"
-);
+document.createElement("div");
 
 name.className =
 "product-name";
@@ -2182,9 +1958,7 @@ item[0];
 
 
 const price =
-document.createElement(
-"div"
-);
+document.createElement("div");
 
 price.className =
 "product-price";
@@ -2194,9 +1968,7 @@ item[1];
 
 
 const button =
-document.createElement(
-"button"
-);
+document.createElement("button");
 
 button.className =
 "buy-btn";
@@ -2205,7 +1977,8 @@ button.innerText =
 "BUY";
 
 
-button.onclick=()=>{
+button.onclick =
+function(){
 
 buyProduct(
 item[0],
@@ -2216,7 +1989,9 @@ item[1]
 
 
 row.appendChild(name);
+
 row.appendChild(price);
+
 row.appendChild(button);
 
 el.appendChild(row);
@@ -2225,6 +2000,10 @@ el.appendChild(row);
 
 }
 
+
+/* ==========================================
+INIT
+========================================== */
 
 renderList(
 UC,
@@ -2257,9 +2036,9 @@ DIAMONDS,
 );
 
 
-/*************************************************
- * PAGE
- *************************************************/
+/* ==========================================
+PAGE
+========================================== */
 
 function openPage(
 pageId
@@ -2267,18 +2046,19 @@ pageId
 
 document
 .querySelectorAll(".page")
-.forEach(
-p=>p.classList.remove(
+.forEach(page => {
+
+page.classList.remove(
 "active"
-)
 );
+
+});
 
 
 const page =
 document.getElementById(
 pageId
 );
-
 
 if(page){
 
@@ -2296,9 +2076,9 @@ behavior:"smooth"
 }
 
 
-/*************************************************
- * BUY
- *************************************************/
+/* ==========================================
+BUY
+========================================== */
 
 function buyProduct(
 product,
@@ -2308,25 +2088,31 @@ price
 document
 .getElementById(
 "orderProduct"
-).value=product;
+)
+.value =
+product;
 
 
 document
 .getElementById(
 "orderPrice"
-).value=price;
+)
+.value =
+price;
 
 
 document
 .getElementById(
 "playerId"
-).value="";
+)
+.value = "";
 
 
 document
 .getElementById(
 "serverId"
-).value="";
+)
+.value = "";
 
 
 openPage(
@@ -2336,63 +2122,120 @@ openPage(
 }
 
 
-/*************************************************
- * TELEGRAM USER
- *************************************************/
+/* ==========================================
+POST REQUEST
+========================================== */
 
-function getTelegramUser(){
+async function apiPost(
+data
+){
 
-return tg.initDataUnsafe &&
-tg.initDataUnsafe.user
-? tg.initDataUnsafe.user
-: null;
+const response =
+await fetch(
+APPS_SCRIPT_URL,
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"text/plain;charset=utf-8"
+},
+
+body:
+JSON.stringify(data)
+
+}
+);
+
+const text =
+await response.text();
+
+let result;
+
+try{
+
+result =
+JSON.parse(text);
+
+}catch(e){
+
+throw new Error(
+"Invalid server response: "
++
+text
+);
+
+}
+
+return result;
 
 }
 
 
-/*************************************************
- * SUBMIT ORDER
- *************************************************/
+/* ==========================================
+CREATE ORDER
+========================================== */
 
-function submitOrder(){
+async function submitOrder(){
 
 const product =
 document
 .getElementById(
 "orderProduct"
-).value;
+)
+.value;
+
 
 const price =
 document
 .getElementById(
 "orderPrice"
-).value;
+)
+.value;
+
 
 const playerId =
 document
 .getElementById(
 "playerId"
-).value
+)
+.value
 .trim();
+
 
 const serverId =
 document
 .getElementById(
 "serverId"
-).value
+)
+.value
 .trim();
+
 
 const payment =
 document
 .getElementById(
 "payment"
-).value;
+)
+.value;
+
+
+if(!product){
+
+tg.showAlert(
+"⚠️ Please select a product."
+);
+
+return;
+
+}
 
 
 if(!playerId){
 
 tg.showAlert(
-"⚠️ Please enter Player ID / Username"
+"⚠️ Please enter Player ID / Username."
 );
 
 return;
@@ -2421,13 +2264,16 @@ document.getElementById(
 );
 
 
-button.disabled=true;
+button.disabled = true;
 
 button.innerText =
-"⏳ SENDING...";
+"⏳ SENDING ORDER...";
 
 
-const data={
+try{
+
+const result =
+await apiPost({
 
 action:
 "createOrder",
@@ -2436,7 +2282,11 @@ telegramId:
 String(user.id),
 
 username:
-user.username || "",
+user.username
+?
+user.username
+:
+"",
 
 product:
 product,
@@ -2453,62 +2303,87 @@ serverId,
 payment:
 payment
 
-};
+});
 
 
-fetch(
-APPS_SCRIPT_URL,
-{
+if(result.success){
 
-method:"POST",
+const orderId =
+result.orderId
+||
+result.id
+||
+"";
 
-headers:{
-"Content-Type":
-"text/plain;charset=utf-8"
-},
-
-body:
-JSON.stringify(data)
-
-}
-)
-
-.then(
-r=>r.json()
-)
-
-.then(
-result=>{
-
-if(
-result.success
-){
 
 saveLocalOrder({
 
 id:
-result.orderId,
+orderId,
+
+telegramId:
+String(user.id),
+
+username:
+user.username
+?
+user.username
+:
+"",
+
+product:
+product,
+
+price:
+price,
+
+player:
+playerId,
+
+server:
+serverId,
+
+payment:
+payment,
 
 status:
-"PENDING"
+"PENDING",
+
+time:
+new Date().toLocaleString()
 
 });
 
 
 tg.showAlert(
 
-"✅ ORDER CREATED!\n\n"+
+"✅ ORDER CREATED!\n\n"
 
-"📦 Order ID:\n"+
-result.orderId+
++
 
-"\n\n🎮 Product:\n"+
-product+
+"📦 Order ID:\n"
++
+orderId
 
-"\n\n💰 Price:\n"+
-price+
++
 
-"\n\n⏳ Status: PENDING"
+"\n\n🎮 Product:\n"
++
+product
+
++
+
+"\n\n💰 Price:\n"
++
+price
+
++
+
+"\n\n⏳ Status: PENDING\n\n"
+
++
+
+"👤 Please wait for admin confirmation."
 
 );
 
@@ -2517,50 +2392,55 @@ openPage(
 "ordersPage"
 );
 
-showOrders();
-
-startStatusWatcher();
+loadMyOrders();
 
 }else{
 
 tg.showAlert(
-"❌ ORDER FAILED\n\n"+
-(result.error ||
-"Unknown error")
+
+"❌ ORDER FAILED\n\n"
+
++
+
+(
+result.error
+||
+"Order could not be created."
+)
+
 );
 
 }
 
-}
-)
-
-.catch(
-error=>{
+}catch(error){
 
 console.error(error);
 
 tg.showAlert(
-"❌ CONNECTION ERROR\n\nPlease try again."
+
+"❌ CONNECTION ERROR\n\n"
+
++
+error.message
+
 );
 
-}
-)
+}finally{
 
-.finally(()=>{
+button.disabled =
+false;
 
-button.disabled=false;
-
-button.innerText=
+button.innerText =
 "🛒 CONFIRM ORDER";
 
-});
+}
 
 }
 
 
-/*************************************************
- * LOCAL STORAGE
- *************************************************/
+/* ==========================================
+LOCAL STORAGE
+========================================== */
 
 function saveLocalOrder(
 order
@@ -2570,19 +2450,25 @@ let orders =
 JSON.parse(
 localStorage.getItem(
 "central_orders"
-)||"[]"
+)
+||
+"[]"
 );
 
 
 const index =
 orders.findIndex(
-x=>x.id===order.id
+x =>
+String(x.id)
+===
+String(order.id)
 );
 
 
-if(index>=0){
+if(index >= 0){
 
-orders[index]={
+orders[index] =
+{
 ...orders[index],
 ...order
 };
@@ -2606,151 +2492,103 @@ orders
 }
 
 
-/*************************************************
- * GET ORDERS
- *************************************************/
+/* ==========================================
+NORMALIZE STATUS
+========================================== */
 
-function getLocalOrders(){
-
-return JSON.parse(
-localStorage.getItem(
-"central_orders"
-)||"[]"
-);
-
-}
-
-
-/*************************************************
- * CHECK ONE ORDER
- *************************************************/
-
-async function checkOrderStatus(
-order
+function normalizeStatus(
+status
 ){
 
-const user =
-getTelegramUser();
-
-if(!user)return;
+if(!status)
+return "PENDING";
 
 
-try{
-
-const url =
-APPS_SCRIPT_URL+
-"?action=getOrder"+
-"&orderId="+
-encodeURIComponent(order.id)+
-"&telegramId="+
-encodeURIComponent(
-String(user.id)
-);
-
-
-const response =
-await fetch(url);
-
-
-const result =
-await response.json();
+const s =
+String(status)
+.toUpperCase()
+.trim();
 
 
 if(
-result.success &&
-result.order
+s === "SUCCESS" ||
+s === "COMPLETED" ||
+s === "APPROVED" ||
+s === "CONFIRMED"
 ){
 
-saveLocalOrder({
-
-id:
-result.order.id,
-
-status:
-result.order.status
-
-});
+return "SUCCESS";
 
 }
 
-}catch(err){
-
-console.log(
-"Status check failed",
-err
-);
-
-}
-
-}
-
-
-/*************************************************
- * WATCHER
- *************************************************/
-
-let statusWatcher=null;
-
-
-function startStatusWatcher(){
-
-if(statusWatcher)
-clearInterval(
-statusWatcher
-);
-
-
-statusWatcher =
-setInterval(
-async()=>{
-
-const orders =
-getLocalOrders();
-
-
-for(
-const order of orders
-){
 
 if(
-order.status ===
-"PENDING"
+s === "CANCELLED" ||
+s === "CANCELED" ||
+s === "REJECTED" ||
+s === "FAILED"
 ){
 
-await checkOrderStatus(
-order
-);
-
-}
+return "CANCELLED";
 
 }
 
 
-showOrders(false);
-
-},
-5000
-);
+return "PENDING";
 
 }
 
 
-/*************************************************
- * SHOW ORDERS
- *************************************************/
+/* ==========================================
+STATUS HTML
+========================================== */
 
-async function showOrders(
-goPage=true
+function statusHTML(
+status
 ){
 
-if(goPage){
-
-openPage(
-"ordersPage"
+const s =
+normalizeStatus(
+status
 );
+
+
+if(s === "SUCCESS"){
+
+return `
+<span class="status status-success">
+✅ SUCCESS
+</span>
+`;
 
 }
 
+
+if(s === "CANCELLED"){
+
+return `
+<span class="status status-cancelled">
+❌ CANCELLED
+</span>
+`;
+
+}
+
+
+return `
+<span class="status status-pending">
+⏳ PENDING
+</span>
+`;
+
+}
+
+
+/* ==========================================
+MY ORDERS
+========================================== */
+
+async function loadMyOrders(){
 
 const box =
 document.getElementById(
@@ -2758,19 +2596,173 @@ document.getElementById(
 );
 
 
-const orders =
-getLocalOrders();
+box.innerHTML = `
+<div class="loading">
+⏳ Loading orders...
+</div>
+`;
+
+
+const telegramId =
+getTelegramId();
+
+
+if(!telegramId){
+
+box.innerHTML = `
+<div class="empty">
+⚠️ Please open from Telegram.
+</div>
+`;
+
+return;
+
+}
+
+
+try{
+
+const result =
+await apiPost({
+
+action:
+"getOrders",
+
+telegramId:
+telegramId
+
+});
+
+
+let orders =
+[];
+
+
+if(
+result &&
+Array.isArray(
+result.orders
+)
+){
+
+orders =
+result.orders;
+
+}
+
+
+if(
+!orders.length
+){
+
+const local =
+JSON.parse(
+localStorage.getItem(
+"central_orders"
+)
+||
+"[]"
+);
+
+orders =
+local.filter(
+o =>
+String(o.telegramId)
+===
+String(telegramId)
+);
+
+}
+
+
+orders.forEach(
+order => {
+
+saveLocalOrder({
+...order,
+status:
+normalizeStatus(
+order.status
+)
+});
+
+});
+
+
+renderMyOrders(
+orders
+);
+
+
+}catch(error){
+
+console.error(error);
+
+
+const local =
+JSON.parse(
+localStorage.getItem(
+"central_orders"
+)
+||
+"[]"
+);
+
+
+const myOrders =
+local.filter(
+o =>
+String(o.telegramId)
+===
+String(telegramId)
+);
+
+
+if(myOrders.length){
+
+renderMyOrders(
+myOrders
+);
+
+}else{
+
+box.innerHTML = `
+<div class="empty">
+❌ Unable to load orders.
+</div>
+`;
+
+}
+
+}
+
+}
+
+
+/* ==========================================
+RENDER MY ORDERS
+========================================== */
+
+function renderMyOrders(
+orders
+){
+
+const box =
+document.getElementById(
+"ordersList"
+);
 
 
 if(!orders.length){
 
-box.innerHTML=`
+box.innerHTML = `
 
 <div
 class="form-box"
 style="text-align:center">
 
-<div style="font-size:40px">
+<div
+style="font-size:40px">
 📦
 </div>
 
@@ -2781,7 +2773,8 @@ No Orders Yet
 <p
 style="
 color:#777;
-font-size:11px">
+font-size:11px;
+">
 
 Your orders will appear here.
 
@@ -2796,11 +2789,11 @@ return;
 }
 
 
-box.innerHTML="";
+box.innerHTML = "";
 
 
 orders.forEach(
-order=>{
+order => {
 
 const card =
 document.createElement(
@@ -2811,25 +2804,68 @@ card.className =
 "order-card";
 
 
-card.innerHTML=`
+const status =
+normalizeStatus(
+order.status
+);
+
+
+let message = "";
+
+
+if(status === "SUCCESS"){
+
+message = `
+<div style="
+margin-top:10px;
+padding:10px;
+border-radius:10px;
+background:rgba(24,214,107,.08);
+color:#18d66b;
+font-size:10px;
+font-weight:bold;
+">
+🎉 Order completed successfully!
+</div>
+`;
+
+}
+
+
+if(status === "CANCELLED"){
+
+message = `
+<div style="
+margin-top:10px;
+padding:10px;
+border-radius:10px;
+background:rgba(255,23,68,.08);
+color:#ff1744;
+font-size:10px;
+font-weight:bold;
+">
+❌ This order was cancelled / rejected.
+</div>
+`;
+
+}
+
+
+card.innerHTML = `
 
 <div
 style="
 display:flex;
 justify-content:space-between;
 gap:10px;
-align-items:center">
+align-items:center;
+">
 
 <b>
-📦 ${escapeHtml(order.id)}
+📦 ${escapeHTML(order.id || "-")}
 </b>
 
-<span
-class="status status-${escapeHtml(order.status)}">
-
-${escapeHtml(order.status)}
-
-</span>
+${statusHTML(status)}
 
 </div>
 
@@ -2837,17 +2873,17 @@ ${escapeHtml(order.status)}
 <hr
 style="
 border-color:#222;
-border-width:0 0 1px;">
+border-width:0 0 1px;
+">
 
 
 <p
 style="
 font-size:12px;
-font-weight:bold">
+font-weight:bold;
+">
 
-🎮 ${escapeHtml(
-order.product || "-"
-)}
+🎮 ${escapeHTML(order.product || "-")}
 
 </p>
 
@@ -2855,11 +2891,10 @@ order.product || "-"
 <p
 style="
 color:#ffca28;
-font-weight:bold">
+font-weight:bold;
+">
 
-💰 ${escapeHtml(
-order.price || "-"
-)}
+💰 ${escapeHTML(order.price || "-")}
 
 </p>
 
@@ -2867,12 +2902,11 @@ order.price || "-"
 <p
 style="
 color:#888;
-font-size:10px">
+font-size:10px;
+">
 
 🆔 Player:
-${escapeHtml(
-order.player || "-"
-)}
+${escapeHTML(order.player || order.playerId || "-")}
 
 </p>
 
@@ -2880,12 +2914,11 @@ order.player || "-"
 <p
 style="
 color:#888;
-font-size:10px">
+font-size:10px;
+">
 
 🌐 Server:
-${escapeHtml(
-order.server || "-"
-)}
+${escapeHTML(order.server || order.serverId || "-")}
 
 </p>
 
@@ -2893,13 +2926,15 @@ order.server || "-"
 <p
 style="
 color:#888;
-font-size:10px">
+font-size:10px;
+">
 
-💳 ${escapeHtml(
-order.payment || "-"
-)}
+💳 ${escapeHTML(order.payment || "-")}
 
 </p>
+
+
+${message}
 
 `;
 
@@ -2912,44 +2947,491 @@ card
 }
 
 
-/*************************************************
- * HTML SAFE
- *************************************************/
+/* ==========================================
+ADMIN LOAD ORDERS
+========================================== */
 
-function escapeHtml(
-value
+async function loadAdminOrders(){
+
+if(!isAdmin()){
+
+tg.showAlert(
+"❌ You are not an admin."
+);
+
+return;
+
+}
+
+
+const box =
+document.getElementById(
+"adminOrdersList"
+);
+
+
+box.innerHTML = `
+<div class="loading">
+⏳ Loading all orders...
+</div>
+`;
+
+
+try{
+
+const result =
+await apiPost({
+
+action:
+"getAllOrders",
+
+adminId:
+getTelegramId()
+
+});
+
+
+if(
+!result ||
+!result.success
 ){
 
-return String(
-value ?? ""
-)
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
+throw new Error(
+result &&
+result.error
+?
+result.error
+:
+"Unable to load orders."
 );
 
 }
 
 
-/*************************************************
- * PROFILE
- *************************************************/
+const orders =
+Array.isArray(
+result.orders
+)
+?
+result.orders
+:
+[];
+
+
+renderAdminOrders(
+orders
+);
+
+
+}catch(error){
+
+console.error(error);
+
+box.innerHTML = `
+
+<div class="empty">
+
+❌ Could not load admin orders.
+
+<br><br>
+
+${escapeHTML(
+error.message
+)}
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* ==========================================
+ADMIN RENDER
+========================================== */
+
+function renderAdminOrders(
+orders
+){
+
+const box =
+document.getElementById(
+"adminOrdersList"
+);
+
+
+if(!orders.length){
+
+box.innerHTML = `
+
+<div class="empty">
+
+📦 No orders found.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+box.innerHTML = "";
+
+
+orders.forEach(
+order => {
+
+const card =
+document.createElement(
+"div"
+);
+
+card.className =
+"admin-order";
+
+
+const status =
+normalizeStatus(
+order.status
+);
+
+
+let actions = "";
+
+
+if(status === "PENDING"){
+
+actions = `
+
+<div class="admin-actions">
+
+<button
+class="approve-btn"
+onclick="updateOrderStatus(
+'${safeJS(order.id)}',
+'SUCCESS'
+)">
+
+✅ အတည်ပြု
+
+</button>
+
+
+<button
+class="cancel-btn"
+onclick="updateOrderStatus(
+'${safeJS(order.id)}',
+'CANCELLED'
+)">
+
+❌ ပယ်ဖျက်
+
+</button>
+
+</div>
+
+`;
+
+}
+
+
+card.innerHTML = `
+
+<div
+style="
+display:flex;
+justify-content:space-between;
+gap:8px;
+align-items:center;
+">
+
+<b>
+📦 ${escapeHTML(order.id || "-")}
+</b>
+
+${statusHTML(status)}
+
+</div>
+
+
+<hr
+style="
+border-color:#222;
+border-width:0 0 1px;
+">
+
+
+<p>
+👤 <b>Customer:</b>
+@${escapeHTML(order.username || "-")}
+</p>
+
+
+<p
+style="
+color:#888;
+font-size:10px;
+">
+
+🆔 Telegram ID:
+${escapeHTML(
+order.telegramId || "-"
+)}
+
+</p>
+
+
+<p>
+🎮 <b>Product:</b>
+${escapeHTML(
+order.product || "-"
+)}
+</p>
+
+
+<p
+style="
+color:#ffca28;
+font-weight:bold;
+">
+
+💰 ${escapeHTML(
+order.price || "-"
+)}
+
+</p>
+
+
+<p
+style="
+color:#888;
+font-size:10px;
+">
+
+🎮 Player ID:
+${escapeHTML(
+order.playerId ||
+order.player ||
+"-"
+)}
+
+</p>
+
+
+<p
+style="
+color:#888;
+font-size:10px;
+">
+
+🌐 Server ID:
+${escapeHTML(
+order.serverId ||
+order.server ||
+"-"
+)}
+
+</p>
+
+
+<p
+style="
+color:#888;
+font-size:10px;
+">
+
+💳 Payment:
+${escapeHTML(
+order.payment ||
+"-"
+)}
+
+</p>
+
+
+${actions}
+
+`;
+
+box.appendChild(
+card
+);
+
+});
+
+}
+
+
+/* ==========================================
+UPDATE ORDER STATUS
+========================================== */
+
+async function updateOrderStatus(
+orderId,
+newStatus
+){
+
+if(!isAdmin()){
+
+tg.showAlert(
+"❌ Admin only."
+);
+
+return;
+
+}
+
+
+let confirmText;
+
+
+if(
+newStatus === "SUCCESS"
+){
+
+confirmText =
+"ဒီ Order ကို အတည်ပြုမလား?";
+
+}else{
+
+confirmText =
+"ဒီ Order ကို ပယ်ဖျက်မလား?";
+
+}
+
+
+if(
+!confirm(confirmText)
+){
+
+return;
+
+}
+
+
+try{
+
+const result =
+await apiPost({
+
+action:
+"updateOrder",
+
+orderId:
+orderId,
+
+status:
+newStatus,
+
+adminId:
+getTelegramId()
+
+});
+
+
+if(
+result &&
+result.success
+){
+
+let message;
+
+
+if(
+newStatus === "SUCCESS"
+){
+
+message =
+"✅ Order အတည်ပြုပြီးပါပြီ။";
+
+}else{
+
+message =
+"❌ Order ပယ်ဖျက်ပြီးပါပြီ။";
+
+}
+
+
+tg.showAlert(
+message
+);
+
+
+await loadAdminOrders();
+
+
+}else{
+
+tg.showAlert(
+
+"❌ Status update failed\n\n"
+
++
+
+(
+result &&
+result.error
+?
+result.error
+:
+"Unknown error"
+)
+
+);
+
+}
+
+}catch(error){
+
+console.error(error);
+
+tg.showAlert(
+
+"❌ CONNECTION ERROR\n\n"
+
++
+error.message
+
+);
+
+}
+
+}
+
+
+/* ==========================================
+ADMIN PAGE
+========================================== */
+
+function openAdmin(){
+
+if(!isAdmin()){
+
+tg.showAlert(
+"❌ Admin access denied."
+);
+
+return;
+
+}
+
+
+openPage(
+"adminPage"
+);
+
+loadAdminOrders();
+
+}
+
+
+/* ==========================================
+PROFILE
+========================================== */
 
 function openProfile(){
 
@@ -2962,17 +3444,26 @@ const user =
 getTelegramUser();
 
 
-if(!user)return;
+if(!user)
+return;
 
 
 const fullName =
 
 (
-user.first_name || ""
-)+
-" "+
+user.first_name ||
+""
+)
+
++
+
+" "
+
++
+
 (
-user.last_name || ""
+user.last_name ||
+""
 );
 
 
@@ -2981,7 +3472,9 @@ document
 "profileName"
 )
 .innerText =
-fullName.trim() ||
+
+fullName.trim()
+||
 "Telegram User";
 
 
@@ -2990,9 +3483,11 @@ document
 "profileUsername"
 )
 .innerText =
+
 user.username
 ?
-"@"+user.username
+"@" +
+user.username
 :
 "No username";
 
@@ -3011,718 +3506,198 @@ user.photo_url;
 }
 
 
-/*************************************************
- * COMING SOON
- *************************************************/
+/* ==========================================
+SHOW ORDERS
+========================================== */
+
+function showOrders(){
+
+openPage(
+"ordersPage"
+);
+
+loadMyOrders();
+
+}
+
+
+/* ==========================================
+COMING SOON
+========================================== */
 
 function showComingSoon(
 name
 ){
 
 tg.showAlert(
-name+
+name +
 " section is coming soon."
 );
 
 }
 
 
-/*************************************************
- * START
- *************************************************/
-
-startStatusWatcher();
-
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>Central Shop Admin</title>
-
-<style>
-
-body{
-
-margin:0;
-
-background:
-radial-gradient(
-circle at top,
-#2b101b,
-#080a0f 60%,
-#050608
-);
-
-color:white;
-
-font-family:
-Arial,
-sans-serif;
-
-padding:15px;
-
-}
-
-.container{
-
-max-width:700px;
-
-margin:auto;
-
-}
-
-h1{
-
-color:#ff1744;
-
-}
-
-input{
-
-width:100%;
-
-padding:14px;
-
-border-radius:12px;
-
-border:
-1px solid #333;
-
-background:#11151d;
-
-color:white;
-
-margin-bottom:10px;
-
-box-sizing:border-box;
-
-}
-
-.login{
-
-width:100%;
-
-padding:14px;
-
-border:0;
-
-border-radius:12px;
-
-background:#ff1744;
-
-color:white;
-
-font-weight:bold;
-
-}
-
-.order{
-
-background:
-linear-gradient(
-145deg,
-#161b25,
-#0c0f15
-);
-
-border:
-1px solid rgba(255,255,255,.1);
-
-border-radius:18px;
-
-padding:15px;
-
-margin-top:12px;
-
-}
-
-.pending{
-
-border-color:#ffb000;
-
-}
-
-.success{
-
-border-color:#18d66b;
-
-}
-
-.cancelled{
-
-border-color:#ff1744;
-
-}
-
-.status{
-
-display:inline-block;
-
-padding:6px 9px;
-
-border-radius:8px;
-
-font-size:10px;
-
-font-weight:bold;
-
-}
-
-.PENDING{
-
-background:#5d4700;
-
-color:#ffd740;
-
-}
-
-.SUCCESS{
-
-background:#064f2b;
-
-color:#35ff9a;
-
-}
-
-.CANCELLED{
-
-background:#5a1018;
-
-color:#ff6675;
-
-}
-
-.actions{
-
-display:grid;
-
-grid-template-columns:
-1fr 1fr;
-
-gap:8px;
-
-margin-top:14px;
-
-}
-
-button{
-
-padding:12px;
-
-border:0;
-
-border-radius:10px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-.confirm{
-
-background:#18d66b;
-
-color:#001b0d;
-
-}
-
-.cancel{
-
-background:#ff1744;
-
-color:white;
-
-}
-
-.refresh{
-
-width:100%;
-
-margin-top:10px;
-
-background:#252c38;
-
-color:white;
-
-}
-
-.small{
-
-color:#888;
-
-font-size:11px;
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<div class="container">
-
-
-<h1>
-👑 CENTRAL SHOP ADMIN
-</h1>
-
-
-<div id="loginBox">
-
-<input
-id="adminKey"
-type="password"
-placeholder="Admin Password">
-
-
-<button
-class="login"
-onclick="login()">
-
-🔐 LOGIN
-
-</button>
-
-</div>
-
-
-<div id="adminPanel"
-style="display:none">
-
-
-<button
-class="refresh"
-onclick="loadOrders()">
-
-🔄 REFRESH ORDERS
-
-</button>
-
-
-<div id="orders"></div>
-
-
-</div>
-
-
-</div>
-
-
-<script>
-
-
-const API =
-window.location.origin +
-window.location.pathname;
-
-
-let key="";
-
-
-function login(){
-
-key =
-document
-.getElementById(
-"adminKey"
-)
-.value
-.trim();
-
-
-if(!key){
-
-alert(
-"Please enter admin password"
-);
-
-return;
-
-}
-
-
-document
-.getElementById(
-"loginBox"
-)
-.style.display="none";
-
-
-document
-.getElementById(
-"adminPanel"
-)
-.style.display="block";
-
-
-loadOrders();
-
-}
-
-
-async function loadOrders(){
-
-const box =
-document.getElementById(
-"orders"
-);
-
-
-box.innerHTML =
-"<p>⏳ Loading...</p>";
-
-
-try{
-
-const response =
-await fetch(
-API+
-"?action=getOrders"+
-"&key="+
-encodeURIComponent(key)
-);
-
-
-const result =
-await response.json();
-
-
-if(!result.success){
-
-box.innerHTML =
-"<p>❌ "+
-result.error+
-"</p>";
-
-return;
-
-}
-
-
-if(
-!result.orders.length
-){
-
-box.innerHTML =
-"<p>📦 No orders.</p>";
-
-return;
-
-}
-
-
-box.innerHTML="";
-
-
-result.orders.forEach(
-order=>{
-
-const card =
-document.createElement(
-"div"
-);
-
-
-card.className =
-"order "+
-(
-order.status === "PENDING"
-?
-"pending"
-:
-order.status === "SUCCESS"
-?
-"success"
-:
-"cancelled"
-);
-
-
-card.innerHTML=`
-
-<div>
-
-<b>
-📦 ${safe(order.id)}
-</b>
-
-<span
-class="status ${safe(order.status)}">
-
-${safe(order.status)}
-
-</span>
-
-</div>
-
-
-<p>
-👤 @${safe(
-order.username || "-"
-)}
-</p>
-
-
-<p>
-🆔 Telegram ID:
-${safe(order.telegramId)}
-</p>
-
-
-<p>
-🎮 Product:
-<b>${safe(order.product)}</b>
-</p>
-
-
-<p>
-💰 Price:
-<b>${safe(order.price)}</b>
-</p>
-
-
-<p>
-🆔 Player:
-${safe(order.player)}
-</p>
-
-
-<p>
-🌐 Server:
-${safe(order.server || "-")}
-</p>
-
-
-<p>
-💳 Payment:
-${safe(order.payment)}
-</p>
-
-
-<p class="small">
-🕐 ${safe(order.createdAt)}
-</p>
-
-
-${
-order.status === "PENDING"
-?
-
-`
-
-<div class="actions">
-
-<button
-class="confirm"
-onclick=
-"changeStatus(
-'${safeJs(order.id)}',
-'SUCCESS'
-)">
-
-✅ CONFIRM
-
-</button>
-
-
-<button
-class="cancel"
-onclick=
-"changeStatus(
-'${safeJs(order.id)}',
-'CANCELLED'
-)">
-
-❌ CANCEL
-
-</button>
-
-</div>
-
-`
-
-:
-
-`
-
-<p
-style="
-text-align:center;
-font-weight:bold">
-
-${
-order.status ===
-"SUCCESS"
-
-?
-
-"✅ ORDER COMPLETED"
-
-:
-
-"❌ ORDER CANCELLED"
-
-}
-
-</p>
-
-`
-
-}
-
-`;
-
-box.appendChild(
-card
-);
-
-});
-
-}catch(err){
-
-box.innerHTML =
-"<p>❌ Connection error</p>";
-
-}
-
-}
-
-
-async function changeStatus(
-orderId,
-status
-){
-
-const message =
-status === "SUCCESS"
-?
-"Confirm this order?"
-:
-"Cancel this order?";
-
-
-if(
-!confirm(message)
-){
-
-return;
-
-}
-
-
-try{
-
-const response =
-await fetch(
-API+
-"?action=updateStatus"+
-"&key="+
-encodeURIComponent(key)+
-"&orderId="+
-encodeURIComponent(orderId)+
-"&status="+
-encodeURIComponent(status)
-);
-
-
-const result =
-await response.json();
-
-
-if(result.success){
-
-alert(
-status === "SUCCESS"
-?
-"✅ Order confirmed!"
-:
-"❌ Order cancelled!"
-);
-
-loadOrders();
-
-}else{
-
-alert(
-"❌ "+
-result.error
-);
-
-}
-
-}catch(err){
-
-alert(
-"❌ Connection error"
-);
-
-}
-
-}
-
-
-function safe(
+/* ==========================================
+ESCAPE HTML
+========================================== */
+
+function escapeHTML(
 value
 ){
 
 return String(
 value ?? ""
 )
+
 .replace(
 /&/g,
 "&amp;"
 )
+
 .replace(
 /</g,
 "&lt;"
 )
+
 .replace(
 />/g,
 "&gt;"
 )
+
 .replace(
 /"/g,
 "&quot;"
+)
+
+.replace(
+/'/g,
+"&#039;"
 );
 
 }
 
 
-function safeJs(
+/* ==========================================
+SAFE JS STRING
+========================================== */
+
+function safeJS(
 value
 ){
 
 return String(
 value ?? ""
 )
+
 .replace(
 /\\/g,
 "\\\\"
 )
+
 .replace(
 /'/g,
 "\\'"
+)
+
+.replace(
+/"/g,
+'\\"'
+)
+
+.replace(
+/\n/g,
+"\\n"
+)
+
+.replace(
+/\r/g,
+"\\r"
 );
 
 }
 
+
+/* ==========================================
+AUTO REFRESH
+========================================== */
+
+/*
+ဝယ်သူက My Orders page မှာရှိနေတဲ့အချိန်
+10 စက္ကန့်တိုင်း server က status ပြန်စစ်မယ်။
+*/
+
+setInterval(
+function(){
+
+const ordersPage =
+document.getElementById(
+"ordersPage"
+);
+
+
+if(
+ordersPage &&
+ordersPage.classList.contains(
+"active"
+)
+){
+
+loadMyOrders();
+
+}
+
+},
+10000
+);
+
+
+/*
+Admin page မှာရှိရင်
+10 စက္ကန့်တိုင်း order list refresh လုပ်မယ်။
+*/
+
+setInterval(
+function(){
+
+const adminPage =
+document.getElementById(
+"adminPage"
+);
+
+
+if(
+adminPage &&
+adminPage.classList.contains(
+"active"
+)
+&&
+isAdmin()
+){
+
+loadAdminOrders();
+
+}
+
+},
+10000
+);
+
+
+/* ==========================================
+ADMIN ACCESS
+==========================================
+
+Admin panel ကို ဒီအတိုင်း bottom navigation
+မှာ မထည့်ထားဘူး။
+
+Admin Telegram ID နဲ့ ဒီ function ကို
+ခေါ်နိုင်ပါတယ်။
+
+လိုအပ်ရင် Admin button ကို ထပ်ထည့်နိုင်ပါတယ်။
+
+========================================== */
+
 </script>
 
 </body>
-
 </html>
