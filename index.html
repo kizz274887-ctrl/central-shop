@@ -1,146 +1,1927 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Shop</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      maximum-scale=1.0,user-scalable=no">
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Central Shop</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #111827;
-            color: white;
-        }
+<style>
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-        }
+/* =========================
+   GLOBAL
+========================= */
 
-        .header {
-            text-align: center;
-            padding: 20px 0 25px;
-        }
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        .logo {
-            font-size: 45px;
-        }
+html {
+    scroll-behavior: smooth;
+}
 
-        .header h1 {
-            margin: 8px 0;
-            font-size: 28px;
-        }
+body {
+    margin: 0;
+    background:
+        radial-gradient(circle at top, #25101a 0%, #090b10 45%, #050608 100%);
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-bottom: 95px;
+}
 
-        .header p {
-            margin: 0;
-            color: #9ca3af;
-        }
+button {
+    font-family: inherit;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
+.app {
+    width: 100%;
+    max-width: 650px;
+    margin: auto;
+    padding: 12px;
+}
 
-        .card {
-            background: #1f2937;
-            border-radius: 18px;
-            padding: 25px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+/* =========================
+   TOP HEADER
+========================= */
 
-        .card:active {
-            transform: scale(0.96);
-        }
+.top-header {
+    position: relative;
+    overflow: hidden;
 
-        .icon {
-            font-size: 38px;
-            margin-bottom: 12px;
-        }
+    min-height: 92px;
 
-        .title {
-            font-size: 15px;
-            font-weight: bold;
-        }
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 24px;
 
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #6b7280;
-            font-size: 12px;
-        }
-    </style>
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,0,55,.18),
+            rgba(10,10,16,.95)
+        );
+
+    box-shadow:
+        0 0 30px rgba(255,0,55,.12),
+        inset 0 0 30px rgba(255,255,255,.02);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 15px;
+
+    margin-bottom: 12px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.crown {
+    font-size: 28px;
+}
+
+.brand {
+    line-height: .9;
+}
+
+.brand .central {
+    color: #ff163f;
+    font-size: 25px;
+    font-weight: 1000;
+    font-style: italic;
+    letter-spacing: -1px;
+}
+
+.brand .shop {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 1000;
+    font-style: italic;
+}
+
+.tagline {
+    font-size: 8px;
+    color: #aaa;
+    letter-spacing: 3px;
+    margin-top: 8px;
+}
+
+.profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-mini img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid #ff1744;
+
+    box-shadow:
+        0 0 15px rgba(255,0,50,.45);
+}
+
+.profile-mini span {
+    font-size: 11px;
+    color: #eee;
+    font-weight: bold;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 245px;
+
+    border-radius: 25px;
+
+    border: 1px solid rgba(255,255,255,.13);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,0,45,.18),
+            rgba(0,0,0,.86)
+        );
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 0 35px rgba(255,0,45,.13);
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    opacity: .30;
+
+    filter:
+        contrast(1.15)
+        saturate(1.2);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.9),
+            rgba(0,0,0,.25),
+            rgba(0,0,0,.85)
+        );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+
+    min-height: 245px;
+
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hero-title {
+    max-width: 260px;
+
+    font-size: 34px;
+    font-weight: 1000;
+    font-style: italic;
+
+    line-height: .95;
+
+    text-shadow:
+        0 0 20px rgba(255,0,50,.4);
+}
+
+.hero-title span {
+    color: #ff1744;
+}
+
+.hero-sub {
+    font-size: 12px;
+    color: #ddd;
+    margin-top: 8px;
+}
+
+.support {
+    position: absolute;
+    top: 18px;
+    right: 15px;
+
+    text-align: right;
+
+    font-size: 10px;
+    line-height: 1.5;
+
+    font-weight: bold;
+}
+
+.support strong {
+    color: #ff1744;
+}
+
+/* =========================
+   CENTER GIF
+========================= */
+
+.gif-box {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 3px solid #ff1744;
+
+    background: #000;
+
+    box-shadow:
+        0 0 15px #ff1744,
+        0 0 45px rgba(255,0,50,.45);
+}
+
+.gif-box img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.gif-label {
+    position: absolute;
+
+    bottom: 10px;
+    right: 10px;
+
+    background: rgba(0,0,0,.85);
+
+    border: 1px solid #fff;
+
+    border-radius: 8px;
+
+    padding: 4px 8px;
+
+    font-size: 9px;
+    font-weight: bold;
+}
+
+/* =========================
+   QUICK MENU
+========================= */
+
+.quick-menu {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 7px;
+
+    margin-bottom: 18px;
+}
+
+.quick {
+    min-height: 92px;
+
+    padding: 8px 4px;
+
+    border-radius: 16px;
+
+    text-align: center;
+
+    border: 1px solid rgba(255,255,255,.10);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.06),
+            rgba(0,0,0,.35)
+        );
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.quick:active {
+    transform: scale(.94);
+}
+
+.quick-icon {
+    font-size: 29px;
+    margin-bottom: 7px;
+}
+
+.quick-title {
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.quick-sub {
+    font-size: 7px;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+/* Individual glow */
+
+.q-dia {
+    border-color: #008cff;
+}
+
+.q-premium {
+    border-color: #9b38ff;
+}
+
+.q-uc {
+    border-color: #ff9700;
+}
+
+.q-star {
+    border-color: #ff3d9a;
+}
+
+.q-order {
+    border-color: #18d66b;
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 18px 3px 10px;
+}
+
+.section-title h2 {
+    margin: 0;
+
+    font-size: 17px;
+}
+
+.section-title span {
+    color: #888;
+    font-size: 10px;
+}
+
+/* =========================
+   PRICE CARDS
+========================= */
+
+.price-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.06),
+            rgba(0,0,0,.4)
+        );
+
+    border: 1px solid rgba(255,255,255,.12);
+
+    border-radius: 20px;
+
+    padding: 15px;
+
+    margin-bottom: 12px;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.25);
+}
+
+.price-card.uc {
+    border-color: rgba(255,150,0,.45);
+}
+
+.price-card.premium {
+    border-color: rgba(150,50,255,.45);
+}
+
+.price-card.dia {
+    border-color: rgba(0,140,255,.45);
+}
+
+.price-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 16px;
+    font-weight: 1000;
+
+    margin-bottom: 12px;
+}
+
+.price-head.uc {
+    color: #ffb000;
+}
+
+.price-head.premium {
+    color: #d78cff;
+}
+
+.price-head.dia {
+    color: #61baff;
+}
+
+.price-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 7px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.055);
+}
+
+.price-row:last-child {
+    border-bottom: 0;
+}
+
+.product-name {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.product-price {
+    font-size: 13px;
+    font-weight: 1000;
+}
+
+.buy-btn {
+    border: 0;
+
+    padding: 7px 12px;
+
+    border-radius: 9px;
+
+    color: white;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff1744,
+            #b00028
+        );
+
+    cursor: pointer;
+}
+
+.buy-btn:active {
+    transform: scale(.94);
+}
+
+/* =========================
+   BIG PROMO
+========================= */
+
+.promo {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 17px;
+
+    border-radius: 20px;
+
+    margin: 15px 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #140b0f,
+            #25000a
+        );
+
+    border: 1px solid rgba(255,0,50,.35);
+}
+
+.promo strong {
+    font-size: 18px;
+}
+
+.promo p {
+    color: #aaa;
+    font-size: 11px;
+}
+
+/* =========================
+   TRUST
+========================= */
+
+.trust {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+.trust-item {
+    text-align: center;
+
+    padding: 12px 5px;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,.04);
+
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.trust-item div {
+    font-size: 22px;
+}
+
+.trust-item span {
+    display: block;
+
+    font-size: 8px;
+
+    color: #aaa;
+
+    margin-top: 6px;
+}
+
+/* =========================
+   PAGE / MODAL
+========================= */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.back {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 14px;
+
+    color: #aaa;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.package {
+    background:
+        linear-gradient(
+            145deg,
+            #161b25,
+            #0c0f15
+        );
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    padding: 15px;
+
+    border-radius: 18px;
+
+    margin-bottom: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.package-name {
+    font-weight: 900;
+}
+
+.package-price {
+    color: #ffca28;
+
+    font-weight: 1000;
+
+    margin-top: 5px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-box {
+    background: #11151d;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    border-radius: 20px;
+
+    padding: 17px;
+
+    margin-top: 15px;
+}
+
+.form-box label {
+    display: block;
+
+    color: #aaa;
+
+    font-size: 11px;
+
+    margin: 10px 0 6px;
+}
+
+.form-box input,
+.form-box select {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #2a3342;
+
+    border-radius: 12px;
+
+    background: #080b10;
+
+    color: white;
+
+    outline: none;
+}
+
+.confirm {
+    width: 100%;
+
+    margin-top: 15px;
+
+    padding: 14px;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff1744,
+            #b0002c
+        );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 1000;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav {
+    position: fixed;
+
+    z-index: 50;
+
+    bottom: 8px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: calc(100% - 16px);
+
+    max-width: 650px;
+
+    min-height: 70px;
+
+    border-radius: 22px;
+
+    background:
+        rgba(8,10,15,.96);
+
+    backdrop-filter: blur(20px);
+
+    border:
+        1px solid rgba(255,255,255,.13);
+
+    box-shadow:
+        0 -5px 30px rgba(0,0,0,.5);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    padding: 5px;
+}
+
+.nav-item {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    color: #777;
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    border-radius: 15px;
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+.nav-item.active {
+    color: #ff1744;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,0,50,.15),
+            transparent
+        );
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:430px) {
+
+    .quick-menu {
+        grid-template-columns:
+            repeat(5, 1fr);
+    }
+
+    .quick {
+        min-height: 83px;
+    }
+
+    .quick-icon {
+        font-size: 24px;
+    }
+
+    .quick-title {
+        font-size: 8px;
+    }
+
+    .brand .central {
+        font-size: 21px;
+    }
+
+    .brand .shop {
+        font-size: 20px;
+    }
+
+    .profile-mini img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .hero-title {
+        font-size: 29px;
+    }
+
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-    <div class="header">
-        <div class="logo">🛍️</div>
-        <h1>Central Shop</h1>
-        <p>Welcome to our shop</p>
+<!-- =====================
+     HOME PAGE
+===================== -->
+
+<div id="homePage" class="page active">
+
+    <div class="top-header">
+
+        <div class="logo-area">
+
+            <div class="crown">👑</div>
+
+            <div class="brand">
+
+                <div>
+                    <span class="central">CENTRAL</span>
+                    <span class="shop"> SHOP</span>
+                </div>
+
+                <div class="tagline">
+                    FAST • SAFE • TRUSTED
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="profile-mini">
+
+            <img
+              src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg"
+              alt="Central Cee">
+
+            <span>
+                Welcome<br>Back!
+            </span>
+
+        </div>
+
     </div>
 
-    <div class="grid">
 
-        <div class="card" onclick="openCategory('Game Top Up')">
-            <div class="icon">🎮</div>
-            <div class="title">Game Top Up</div>
-        </div>
+    <!-- HERO -->
 
-        <div class="card" onclick="openCategory('Diamonds')">
-            <div class="icon">💎</div>
-            <div class="title">Diamonds</div>
-        </div>
+    <div class="hero">
 
-        <div class="card" onclick="openCategory('Telegram Stars')">
-            <div class="icon">⭐</div>
-            <div class="title">Telegram Stars</div>
-        </div>
+        <img
+          class="hero-bg"
+          src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg"
+          alt="Central Cee">
 
-        <div class="card" onclick="openCategory('Premium')">
-            <div class="icon">👑</div>
-            <div class="title">Premium</div>
-        </div>
+        <div class="hero-overlay"></div>
 
-        <div class="card" onclick="openCategory('My Orders')">
-            <div class="icon">📦</div>
-            <div class="title">My Orders</div>
-        </div>
+        <div class="hero-content">
 
-        <div class="card" onclick="openCategory('My Account')">
-            <div class="icon">👤</div>
-            <div class="title">My Account</div>
+            <div>
+
+                <div class="hero-title">
+                    CENTRAL<br>
+                    <span>SHOP</span>
+                </div>
+
+                <div class="hero-sub">
+                    YOUR PREMIUM DIGITAL SHOP
+                </div>
+
+            </div>
+
+            <div class="support">
+                TRUSTED SERVICE<br>
+                <strong>24/7 SUPPORT</strong>
+            </div>
+
+
+            <!-- CENTER GIF -->
+
+            <div class="gif-box">
+
+                <img
+                  src="https://media0.giphy.com/media/Q1m9xj4vqwSDRMZDrR/giphy.gif"
+                  alt="Central Cee GIF">
+
+            </div>
+
+            <div class="gif-label">
+                GIF
+            </div>
+
         </div>
 
     </div>
 
-    <div class="footer">
-        Central Shop © 2026
+
+    <!-- QUICK MENU -->
+
+    <div class="quick-menu">
+
+        <div
+          class="quick q-dia"
+          onclick="openPage('diaPage')">
+
+            <div class="quick-icon">💎</div>
+
+            <div class="quick-title">
+                DIAMONDS
+            </div>
+
+            <div class="quick-sub">
+                MLBB
+            </div>
+
+        </div>
+
+
+        <div
+          class="quick q-premium"
+          onclick="openPage('premiumPage')">
+
+            <div class="quick-icon">👑</div>
+
+            <div class="quick-title">
+                PREMIUM
+            </div>
+
+            <div class="quick-sub">
+                Telegram
+            </div>
+
+        </div>
+
+
+        <div
+          class="quick q-uc"
+          onclick="openPage('ucPage')">
+
+            <div class="quick-icon">🎮</div>
+
+            <div class="quick-title">
+                PUBG UC
+            </div>
+
+            <div class="quick-sub">
+                ALL SERVER
+            </div>
+
+        </div>
+
+
+        <div
+          class="quick q-star"
+          onclick="showComingSoon('Telegram Stars')">
+
+            <div class="quick-icon">⭐</div>
+
+            <div class="quick-title">
+                TG STAR
+            </div>
+
+            <div class="quick-sub">
+                Top Up
+            </div>
+
+        </div>
+
+
+        <div
+          class="quick q-order"
+          onclick="showOrders()">
+
+            <div class="quick-icon">📦</div>
+
+            <div class="quick-title">
+                MY ORDERS
+            </div>
+
+            <div class="quick-sub">
+                Orders
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- UC PRICE -->
+
+    <div class="section-title">
+
+        <h2>📌🏆 All Server UC Price 🏆📌</h2>
+
+    </div>
+
+    <div class="price-card uc">
+
+        <div class="price-head uc">
+            🎮 PUBG UC
+        </div>
+
+        <div id="ucHomeList"></div>
+
+    </div>
+
+
+    <!-- PREMIUM PRICE -->
+
+    <div class="section-title">
+
+        <h2>⭐ Telegram Premium ⭐</h2>
+
+    </div>
+
+    <div class="price-card premium">
+
+        <div class="price-head premium">
+            👑 Telegram Premium
+        </div>
+
+        <div id="premiumHomeList"></div>
+
+    </div>
+
+
+    <!-- DIA PRICE -->
+
+    <div class="section-title">
+
+        <h2>💎 ML Diamonds</h2>
+
+    </div>
+
+    <div class="price-card dia">
+
+        <div class="price-head dia">
+            💎 MLBB Diamonds
+        </div>
+
+        <div id="diaHomeList"></div>
+
+    </div>
+
+
+    <!-- PROMO -->
+
+    <div class="promo">
+
+        <strong>
+            ⚡ FAST DELIVERY • BEST SERVICE
+        </strong>
+
+        <p>
+            Need help? Contact our support team
+            anytime.
+        </p>
+
+    </div>
+
+
+    <!-- TRUST -->
+
+    <div class="trust">
+
+        <div class="trust-item">
+            <div>🛡️</div>
+            <span>SAFE SERVICE</span>
+        </div>
+
+        <div class="trust-item">
+            <div>⚡</div>
+            <span>FAST DELIVERY</span>
+        </div>
+
+        <div class="trust-item">
+            <div>💯</div>
+            <span>TRUSTED SHOP</span>
+        </div>
+
     </div>
 
 </div>
 
+
+<!-- =====================
+     PUBG UC PAGE
+===================== -->
+
+<div id="ucPage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <h2>🎮 PUBG UC</h2>
+
+    <p style="color:#888;font-size:11px;">
+        📌 All Server UC Price
+    </p>
+
+    <div id="ucPageList"></div>
+
+</div>
+
+
+<!-- =====================
+     PREMIUM PAGE
+===================== -->
+
+<div id="premiumPage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <h2>👑 Telegram Premium</h2>
+
+    <p style="color:#888;font-size:11px;">
+        ⭐ Premium plans
+    </p>
+
+    <div id="premiumPageList"></div>
+
+</div>
+
+
+<!-- =====================
+     DIAMOND PAGE
+===================== -->
+
+<div id="diaPage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <h2>💎 ML Diamonds</h2>
+
+    <p style="color:#888;font-size:11px;">
+        💎 Regular • Special • Bonus
+    </p>
+
+    <div id="diaPageList"></div>
+
+</div>
+
+
+<!-- =====================
+     ORDER PAGE
+===================== -->
+
+<div id="orderPage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <h2>📦 Create Order</h2>
+
+    <div class="form-box">
+
+        <label>
+            Product
+        </label>
+
+        <input
+          id="orderProduct"
+          readonly>
+
+        <label>
+            Price
+        </label>
+
+        <input
+          id="orderPrice"
+          readonly>
+
+        <label>
+            Player ID / Username
+        </label>
+
+        <input
+          id="playerId"
+          placeholder="Enter your ID">
+
+        <label>
+            Server ID
+        </label>
+
+        <input
+          id="serverId"
+          placeholder="Enter Server ID">
+
+        <label>
+            Payment Method
+        </label>
+
+        <select id="payment">
+
+            <option>
+                Manual Payment
+            </option>
+
+            <option>
+                KBZ Pay
+            </option>
+
+            <option>
+                Wave Pay
+            </option>
+
+            <option>
+                USDT
+            </option>
+
+        </select>
+
+        <button
+          class="confirm"
+          onclick="submitOrder()">
+
+            🛒 CONFIRM ORDER
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================
+     ORDERS PAGE
+===================== -->
+
+<div id="ordersPage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <h2>📦 My Orders</h2>
+
+    <div id="ordersList"></div>
+
+</div>
+
+
+<!-- =====================
+     PROFILE PAGE
+===================== -->
+
+<div id="profilePage" class="page">
+
+    <div class="back"
+         onclick="openPage('homePage')">
+        ← Back
+    </div>
+
+    <div class="form-box"
+         style="text-align:center;">
+
+        <img
+          id="profileImage"
+          src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg"
+          style="
+             width:90px;
+             height:90px;
+             object-fit:cover;
+             border-radius:50%;
+             border:2px solid #ff1744;
+          ">
+
+        <h2 id="profileName">
+            Telegram User
+        </h2>
+
+        <p id="profileUsername"
+           style="color:#888;font-size:12px;">
+        </p>
+
+        <p style="color:#777;font-size:10px;">
+            Welcome to Central Shop
+        </p>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================
+     BOTTOM NAVIGATION
+===================== -->
+
+<div class="bottom-nav">
+
+    <div
+      class="nav-item active"
+      onclick="openPage('homePage')">
+
+        <div class="nav-icon">🏠</div>
+        HOME
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="openPage('diaPage')">
+
+        <div class="nav-icon">💎</div>
+        DIAMONDS
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="openPage('premiumPage')">
+
+        <div class="nav-icon">👑</div>
+        PREMIUM
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="openPage('ucPage')">
+
+        <div class="nav-icon">🎮</div>
+        PUBG UC
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="showComingSoon('Telegram Stars')">
+
+        <div class="nav-icon">⭐</div>
+        TG STAR
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="showOrders()">
+
+        <div class="nav-icon">📦</div>
+        MY ORDER
+
+    </div>
+
+
+    <div
+      class="nav-item"
+      onclick="openProfile()">
+
+        <div class="nav-icon">👤</div>
+        PROFILE
+
+    </div>
+
+</div>
+
+
 <script>
-    const tg = window.Telegram.WebApp;
 
-    tg.ready();
-    tg.expand();
+/* =========================
+   TELEGRAM
+========================= */
 
-    function openCategory(category) {
-        tg.showAlert("You selected: " + category);
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+
+/* =========================
+   PRICE DATA
+========================= */
+
+const UC = [
+
+    ["60 UC", "4,100 Ks"],
+    ["180 UC", "12,200 Ks"],
+    ["325 UC", "20,300 Ks"],
+    ["385 UC", "24,400 Ks"],
+    ["660 UC", "40,500 Ks"],
+    ["720 UC", "44,600 Ks"],
+    ["985 UC", "60,700 Ks"],
+    ["1320 UC", "81,100 Ks"],
+    ["1800 UC", "101,600 Ks"],
+    ["3850 UC", "200,600 Ks"],
+    ["8100 UC", "393,700 Ks"]
+
+];
+
+
+const PREMIUM = [
+
+    ["⭐ 1 Month", "25,000 Ks"],
+    ["🎁 3 Months", "60,000 Ks"],
+    ["🎁 6 Months", "85,000 Ks"],
+    ["🎁 12 Months", "145,000 Ks"]
+
+];
+
+
+const DIAMONDS = [
+
+    ["5 Diamonds (Regular)", "500 MMK"],
+    ["11 Diamonds (Regular)", "1,000 MMK"],
+    ["22 Diamonds (Regular)", "2,000 MMK"],
+    ["86 Diamonds (Regular)", "6,000 MMK"],
+    ["175 Diamonds (Regular)", "11,500 MMK"],
+    ["257 Diamonds (Regular)", "16,500 MMK"],
+    ["343 Diamonds (Regular)", "22,000 MMK"],
+    ["429 Diamonds (Regular)", "27,500 MMK"],
+    ["515 Diamonds (Regular)", "33,000 MMK"],
+    ["600 Diamonds (Regular)", "38,000 MMK"],
+    ["706 Diamonds (Regular)", "44,000 MMK"],
+    ["1049 Diamonds (Regular)", "67,000 MMK"],
+    ["1135 Diamonds (Regular)", "71,000 MMK"],
+    ["2195 Diamonds (Regular)", "140,000 MMK"],
+    ["Weekly Pass (Special)", "6,600 MMK"],
+    ["Twilight Pass (Special)", "38,000 MMK"],
+    ["50+50 (Bonus)", "4,000 MMK"],
+    ["150+150 (Bonus)", "11,000 MMK"],
+    ["250+250 (Bonus)", "17,500 MMK"],
+    ["500+500 (Bonus)", "35,500 MMK"]
+
+];
+
+
+/* =========================
+   RENDER PRICE LIST
+========================= */
+
+function renderList(data, elementId) {
+
+    const el =
+        document.getElementById(elementId);
+
+    if (!el) return;
+
+    el.innerHTML = "";
+
+    data.forEach(item => {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "price-row";
+
+        row.innerHTML = `
+
+            <div class="product-name">
+                ${item[0]}
+            </div>
+
+            <div class="product-price">
+                ${item[1]}
+            </div>
+
+            <button
+              class="buy-btn"
+              onclick="buyProduct('${item[0]}','${item[1]}')">
+
+                BUY
+
+            </button>
+
+        `;
+
+        el.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+renderList(UC, "ucHomeList");
+renderList(UC, "ucPageList");
+
+renderList(
+    PREMIUM,
+    "premiumHomeList"
+);
+
+renderList(
+    PREMIUM,
+    "premiumPageList"
+);
+
+renderList(
+    DIAMONDS,
+    "diaHomeList"
+);
+
+renderList(
+    DIAMONDS,
+    "diaPageList"
+);
+
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function openPage(pageId) {
+
+    document
+      .querySelectorAll(".page")
+      .forEach(page => {
+
+          page.classList.remove("active");
+
+    });
+
+    const page =
+        document.getElementById(pageId);
+
+    if (page) {
+
+        page.classList.add("active");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
     }
+
+}
+
+
+/* =========================
+   BUY
+========================= */
+
+function buyProduct(product, price) {
+
+    document
+      .getElementById("orderProduct")
+      .value = product;
+
+    document
+      .getElementById("orderPrice")
+      .value = price;
+
+    document
+      .getElementById("playerId")
+      .value = "";
+
+    document
+      .getElementById("serverId")
+      .value = "";
+
+    openPage("orderPage");
+
+}
+
+
+/* =========================
+   SUBMIT ORDER
+========================= */
+
+function submitOrder() {
+
+    const product =
+        document
+        .getElementById("orderProduct")
+        .value;
+
+    const price =
+        document
+        .getElementById("orderPrice")
+        .value;
+
+    const player =
+        document
+        .getElementById("playerId")
+        .value
+        .trim();
+
+    const server =
+        document
+        .getElementById("serverId")
+        .value
+        .trim();
+
+    const payment =
+        document
+        .getElementById("payment")
+        .value;
+
+
+    if (!player) {
+
+        tg.showAlert(
+            "⚠️ Please enter Player ID / Username"
+        );
+
+        return;
+
+    }
+
+
+    const order = {
+
+        id:
+            "CS" +
+            Date.now(),
+
+        product: product,
+
+        price: price,
+
+        player: player,
+
+        server: server,
+
+        payment: payment,
+
+        status: "Pending",
+
+        time:
+            new Date()
+            .toLocaleString()
+
+    };
+
+
+    let orders =
+        JSON.parse(
+            localStorage.getItem(
+                "central_orders"
+            ) || "[]"
+        );
+
+
+    orders.unshift(order);
+
+
+    localStorage.setItem(
+        "central_orders",
+        JSON.stringify(orders)
+    );
+
+
+    tg.showAlert(
+
+        "✅ Order Created!\n\n" +
+
+        "Order: " +
+        order.id +
+
+        "\nProduct: " +
+        product +
+
+        "\nPrice: " +
+        price +
+
+        "\nPlayer ID: " +
+        player +
+
+        "\n\nStatus: Pending"
+
+    );
+
+
+    openPage("ordersPage");
+
+    showOrders();
+
+}
+
+
+/* =========================
+   MY ORDERS
+========================= */
+
+function showOrders() {
+
+    openPage("ordersPage");
+
+    const box =
+        document.getElementById(
+            "ordersList"
+        );
+
+
+    let orders =
+        JSON.parse(
+            localStorage.getItem(
+                "central_orders"
+            ) || "[]"
+        );
+
+
+    if (!orders.length) {
+
+        box.innerHTML = `
+
+            <div class="form-box"
+                 style="text-align:center">
+
+                <div style="font-size:40px">
+                    📦
+                </div>
+
+                <h3>
+                    No Orders Yet
+                </h3>
+
+                <p style="
+                    color:#777;
+                    font-size:11px;
+                ">
+                    Your orders will appear here.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    box.innerHTML = "";
+
+
+    orders.forEach(order => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "price-card";
+
+
+        card.innerHTML = `
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+            ">
+
+                <b>
+                    📦 ${order.id}
+                </b>
+
+                <span style="
+                    color:#ffca28;
+                    font-size:10px;
+                ">
+                    ${order.status}
+                </span>
+
+            </div>
+
+            <hr style="
+                border-color:#222;
+                border-width:0 0 1px;
+            ">
+
+            <p style="
+                font-size:12px;
+            ">
+                ${order.product}
+            </p>
+
+            <p style="
+                color:#ffca28;
+                font-weight:bold;
+            ">
+                ${order.price}
+            </p>
+
+            <p style="
+                color:#777;
+                font-size:10px;
+            ">
+                ID: ${order.player}
+            </p>
+
+        `;
+
+
+        box.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+function openProfile() {
+
+    openPage("profilePage");
+
+
+    if (
+        tg &&
+        tg.initDataUnsafe &&
+        tg.initDataUnsafe.user
+    ) {
+
+        const user =
+            tg.initDataUnsafe.user;
+
+
+        document
+          .getElementById(
+              "profileName"
+          )
+          .innerText =
+            (
+                user.first_name ||
+                ""
+            ) +
+            " " +
+            (
+                user.last_name ||
+                ""
+            );
+
+
+        if (user.username) {
+
+            document
+              .getElementById(
+                  "profileUsername"
+              )
+              .innerText =
+                "@" +
+                user.username;
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   COMING SOON
+========================= */
+
+function showComingSoon(name) {
+
+    tg.showAlert(
+        name +
+        " section is coming soon."
+    );
+
+}
+
 </script>
 
 </body>
