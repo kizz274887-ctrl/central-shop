@@ -1,2408 +1,1147 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,
-  initial-scale=1.0,
-  maximum-scale=1.0,
-  user-scalable=no">
-
-<title>Central Shop</title>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-
-  margin: 0;
-
-  background:
-    radial-gradient(
-      circle at top,
-      #2b101b 0%,
-      #090b10 45%,
-      #050608 100%
-    );
-
-  color: #fff;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  padding-bottom: 100px;
-
-}
-
-button,
-input,
-select {
-  font-family: inherit;
-}
-
-.app {
-
-  width: 100%;
-
-  max-width: 650px;
-
-  margin: auto;
-
-  padding: 12px;
-
-}
-
-
-/* HEADER */
-
-.top-header {
-
-  min-height: 92px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,0,55,.20),
-      rgba(10,10,16,.95)
-    );
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  padding: 12px 15px;
-
-  margin-bottom: 12px;
-
-  box-shadow:
-    0 0 30px
-    rgba(255,0,55,.12);
-
-}
-
-.logo-area {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-}
-
-.crown {
-
-  font-size: 28px;
-
-}
-
-.brand {
-
-  line-height: .9;
-
-}
-
-.central {
-
-  color: #ff1744;
-
-  font-size: 25px;
-
-  font-weight: 1000;
-
-  font-style: italic;
-
-}
-
-.shop {
-
-  color: white;
-
-  font-size: 24px;
-
-  font-weight: 1000;
-
-  font-style: italic;
-
-}
-
-.tagline {
-
-  color: #aaa;
-
-  font-size: 8px;
-
-  letter-spacing: 3px;
-
-  margin-top: 8px;
-
-}
-
-.profile-mini {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 7px;
-
-}
-
-.profile-mini img {
-
-  width: 52px;
-
-  height: 52px;
-
-  border-radius: 50%;
-
-  object-fit: cover;
-
-  border: 2px solid #ff1744;
-
-}
-
-.profile-mini span {
-
-  font-size: 10px;
-
-  font-weight: bold;
-
-}
-
-
-/* HERO */
-
-.hero {
-
-  position: relative;
-
-  overflow: hidden;
-
-  min-height: 250px;
-
-  border-radius: 25px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.13);
-
-  margin-bottom: 15px;
-
-  background: #090909;
-
-}
-
-.hero-bg {
-
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-
-  height: 100%;
-
-  object-fit: cover;
-
-  opacity: .35;
-
-}
-
-.hero-overlay {
-
-  position: absolute;
-
-  inset: 0;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,.92),
-      rgba(0,0,0,.25),
-      rgba(0,0,0,.88)
-    );
-
-}
-
-.hero-content {
-
-  position: relative;
-
-  z-index: 2;
-
-  min-height: 250px;
-
-  padding: 18px;
-
-}
-
-.hero-title {
-
-  font-size: 34px;
-
-  line-height: .95;
-
-  font-weight: 1000;
-
-  font-style: italic;
-
-}
-
-.hero-title span {
-
-  color: #ff1744;
-
-}
-
-.hero-sub {
-
-  color: #ddd;
-
-  font-size: 11px;
-
-  margin-top: 8px;
-
-}
-
-.support {
-
-  position: absolute;
-
-  top: 17px;
-
-  right: 15px;
-
-  text-align: right;
-
-  font-size: 9px;
-
-  font-weight: bold;
-
-}
-
-.support strong {
-
-  color: #ff1744;
-
-}
-
-
-/* GIF */
-
-.gif-box {
-
-  position: absolute;
-
-  left: 50%;
-
-  top: 58%;
-
-  transform:
-    translate(-50%,-50%);
-
-  width: 130px;
-
-  height: 130px;
-
-  border-radius: 50%;
-
-  overflow: hidden;
-
-  border: 3px solid #ff1744;
-
-  background: #000;
-
-  box-shadow:
-    0 0 18px #ff1744,
-    0 0 50px
-    rgba(255,0,50,.5);
-
-}
-
-.gif-box img {
-
-  width: 100%;
-
-  height: 100%;
-
-  object-fit: cover;
-
-}
-
-
-/* QUICK MENU */
-
-.quick-menu {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(5,1fr);
-
-  gap: 7px;
-
-  margin-bottom: 18px;
-
-}
-
-.quick {
-
-  min-height: 88px;
-
-  padding: 8px 3px;
-
-  border-radius: 16px;
-
-  text-align: center;
-
-  border:
-    1px solid
-    rgba(255,255,255,.10);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.06),
-      rgba(0,0,0,.35)
-    );
-
-  cursor: pointer;
-
-}
-
-.quick:active {
-
-  transform: scale(.94);
-
-}
-
-.quick-icon {
-
-  font-size: 26px;
-
-  margin-bottom: 6px;
-
-}
-
-.quick-title {
-
-  font-size: 8px;
-
-  font-weight: 1000;
-
-}
-
-.quick-sub {
-
-  color: #999;
-
-  font-size: 7px;
-
-  margin-top: 5px;
-
-}
-
-.q-dia {
-  border-color: #008cff;
-}
-
-.q-premium {
-  border-color: #9b38ff;
-}
-
-.q-uc {
-  border-color: #ff9700;
-}
-
-.q-star {
-  border-color: #ff3d9a;
-}
-
-.q-order {
-  border-color: #18d66b;
-}
-
-
-/* SECTION */
-
-.section-title {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  margin:
-    18px 3px 10px;
-
-}
-
-.section-title h2 {
-
-  margin: 0;
-
-  font-size: 16px;
-
-}
-
-
-/* PRICE CARD */
-
-.price-card {
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.06),
-      rgba(0,0,0,.4)
-    );
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
-  border-radius: 20px;
-
-  padding: 14px;
-
-  margin-bottom: 12px;
-
-}
-
-.price-card.uc {
-  border-color:
-    rgba(255,150,0,.45);
-}
-
-.price-card.premium {
-  border-color:
-    rgba(150,50,255,.45);
-}
-
-.price-card.dia {
-  border-color:
-    rgba(0,140,255,.45);
-}
-
-.price-head {
-
-  font-size: 16px;
-
-  font-weight: 1000;
-
-  margin-bottom: 10px;
-
-}
-
-.price-head.uc {
-  color: #ffb000;
-}
-
-.price-head.premium {
-  color: #d78cff;
-}
-
-.price-head.dia {
-  color: #61baff;
-}
-
-.price-row {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr auto auto;
-
-  align-items: center;
-
-  gap: 7px;
-
-  padding: 10px 4px;
-
-  border-bottom:
-    1px solid
-    rgba(255,255,255,.05);
-
-}
-
-.product-name {
-
-  font-size: 11px;
-
-  font-weight: 800;
-
-}
-
-.product-price {
-
-  font-size: 11px;
-
-  font-weight: 1000;
-
-  color: #ffca28;
-
-}
-
-.buy-btn {
-
-  border: 0;
-
-  padding: 7px 10px;
-
-  border-radius: 9px;
-
-  color: white;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ff1744,
-      #b00028
-    );
-
-  font-size: 9px;
-
-  font-weight: 1000;
-
-}
-
-
-/* PAGE */
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.back {
-
-  display: inline-block;
-
-  margin-bottom: 14px;
-
-  color: #aaa;
-
-  font-size: 12px;
-
-  cursor: pointer;
-
-}
-
-
-/* FORM */
-
-.form-box {
-
-  background: #11151d;
-
-  border:
-    1px solid
-    rgba(255,255,255,.1);
-
-  border-radius: 20px;
-
-  padding: 17px;
-
-}
-
-.form-box label {
-
-  display: block;
-
-  color: #aaa;
-
-  font-size: 11px;
-
-  margin:
-    10px 0 6px;
-
-}
-
-.form-box input,
-.form-box select {
-
-  width: 100%;
-
-  padding: 13px;
-
-  border:
-    1px solid #2a3342;
-
-  border-radius: 12px;
-
-  background: #080b10;
-
-  color: white;
-
-  outline: none;
-
-}
-
-.confirm {
-
-  width: 100%;
-
-  margin-top: 15px;
-
-  padding: 14px;
-
-  border: 0;
-
-  border-radius: 13px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ff1744,
-      #b0002c
-    );
-
-  color: white;
-
-  font-size: 14px;
-
-  font-weight: 1000;
-
-}
-
-
-/* ORDER CARD */
-
-.order-card {
-
-  background:
-    linear-gradient(
-      145deg,
-      #161b25,
-      #0c0f15
-    );
-
-  border:
-    1px solid
-    rgba(255,255,255,.09);
-
-  border-radius: 18px;
-
-  padding: 15px;
-
-  margin-bottom: 10px;
-
-}
-
-.status {
-
-  display: inline-block;
-
-  padding: 5px 8px;
-
-  border-radius: 8px;
-
-  background:
-    rgba(255,255,255,.08);
-
-  font-size: 9px;
-
-  font-weight: bold;
-
-}
-
-
-/* TRUST */
-
-.trust {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3,1fr);
-
-  gap: 8px;
-
-  margin-top: 15px;
-
-}
-
-.trust-item {
-
-  text-align: center;
-
-  padding: 12px 4px;
-
-  border-radius: 15px;
-
-  background:
-    rgba(255,255,255,.04);
-
-  border:
-    1px solid
-    rgba(255,255,255,.08);
-
-}
-
-.trust-item div {
-
-  font-size: 21px;
-
-}
-
-.trust-item span {
-
-  display: block;
-
-  color: #aaa;
-
-  font-size: 7px;
-
-  margin-top: 6px;
-
-}
-
-
-/* BOTTOM NAV */
-
-.bottom-nav {
-
-  position: fixed;
-
-  z-index: 100;
-
-  bottom: 8px;
-
-  left: 50%;
-
-  transform:
-    translateX(-50%);
-
-  width:
-    calc(100% - 16px);
-
-  max-width: 650px;
-
-  min-height: 70px;
-
-  border-radius: 22px;
-
-  background:
-    rgba(8,10,15,.96);
-
-  backdrop-filter:
-    blur(20px);
-
-  border:
-    1px solid
-    rgba(255,255,255,.13);
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(7,1fr);
-
-  padding: 5px;
-
-}
-
-.nav-item {
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 4px;
-
-  color: #777;
-
-  font-size: 7px;
-
-  font-weight: 900;
-
-  cursor: pointer;
-
-  border-radius: 15px;
-
-}
-
-.nav-icon {
-
-  font-size: 19px;
-
-}
-
-.nav-item.active {
-
-  color: #ff1744;
-
-  background:
-    rgba(255,0,50,.10);
-
-}
-
-
-@media(max-width:430px) {
-
-  .quick-icon {
-    font-size: 23px;
-  }
-
-  .quick-title {
-    font-size: 7px;
-  }
-
-  .brand .central {
-    font-size: 21px;
-  }
-
-  .brand .shop {
-    font-size: 20px;
-  }
-
-  .profile-mini img {
-    width: 44px;
-    height: 44px;
-  }
-
-  .hero-title {
-    font-size: 29px;
-  }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<div class="app">
-
-
-<!-- HOME -->
-
-<div id="homePage" class="page active">
-
-
-<div class="top-header">
-
-  <div class="logo-area">
-
-    <div class="crown">👑</div>
-
-    <div class="brand">
-
-      <div>
-        <span class="central">
-          CENTRAL
-        </span>
-
-        <span class="shop">
-          SHOP
-        </span>
-      </div>
-
-      <div class="tagline">
-        FAST • SAFE • TRUSTED
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="profile-mini">
-
-    <img
-      src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg">
-
-    <span>
-      Welcome<br>
-      Back!
-    </span>
-
-  </div>
-
-</div>
-
-
-<!-- HERO -->
-
-<div class="hero">
-
-  <img
-    class="hero-bg"
-    src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg">
-
-  <div class="hero-overlay"></div>
-
-  <div class="hero-content">
-
-    <div>
-
-      <div class="hero-title">
-
-        CENTRAL<br>
-
-        <span>
-          SHOP
-        </span>
-
-      </div>
-
-      <div class="hero-sub">
-        YOUR PREMIUM DIGITAL SHOP
-      </div>
-
-    </div>
-
-
-    <div class="support">
-
-      TRUSTED SERVICE<br>
-
-      <strong>
-        24/7 SUPPORT
-      </strong>
-
-    </div>
-
-
-    <div class="gif-box">
-
-      <img
-        src="https://media0.giphy.com/media/Q1m9xj4vqwSDRMZDrR/giphy.gif">
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- QUICK MENU -->
-
-<div class="quick-menu">
-
-
-<div
-  class="quick q-dia"
-  onclick="openPage('diaPage')">
-
-  <div class="quick-icon">
-    💎
-  </div>
-
-  <div class="quick-title">
-    DIAMONDS
-  </div>
-
-  <div class="quick-sub">
-    MLBB
-  </div>
-
-</div>
-
-
-<div
-  class="quick q-premium"
-  onclick="openPage('premiumPage')">
-
-  <div class="quick-icon">
-    👑
-  </div>
-
-  <div class="quick-title">
-    PREMIUM
-  </div>
-
-  <div class="quick-sub">
-    TELEGRAM
-  </div>
-
-</div>
-
-
-<div
-  class="quick q-uc"
-  onclick="openPage('ucPage')">
-
-  <div class="quick-icon">
-    🎮
-  </div>
-
-  <div class="quick-title">
-    PUBG UC
-  </div>
-
-  <div class="quick-sub">
-    ALL SERVER
-  </div>
-
-</div>
-
-
-<div
-  class="quick q-star"
-  onclick="showComingSoon('Telegram Stars')">
-
-  <div class="quick-icon">
-    ⭐
-  </div>
-
-  <div class="quick-title">
-    TG STAR
-  </div>
-
-  <div class="quick-sub">
-    TOP UP
-  </div>
-
-</div>
-
-
-<div
-  class="quick q-order"
-  onclick="showOrders()">
-
-  <div class="quick-icon">
-    📦
-  </div>
-
-  <div class="quick-title">
-    MY ORDERS
-  </div>
-
-  <div class="quick-sub">
-    ORDERS
-  </div>
-
-</div>
-
-
-</div>
-
-
-<!-- UC -->
-
-<div class="section-title">
-
-  <h2>
-    📌🏆 All Server UC Price 🏆📌
-  </h2>
-
-</div>
-
-
-<div class="price-card uc">
-
-  <div class="price-head uc">
-    🎮 PUBG UC
-  </div>
-
-  <div id="ucHomeList"></div>
-
-</div>
-
-
-<!-- PREMIUM -->
-
-<div class="section-title">
-
-  <h2>
-    ⭐ Telegram Premium ⭐
-  </h2>
-
-</div>
-
-
-<div class="price-card premium">
-
-  <div class="price-head premium">
-    👑 Telegram Premium
-  </div>
-
-  <div id="premiumHomeList"></div>
-
-</div>
-
-
-<!-- DIA -->
-
-<div class="section-title">
-
-  <h2>
-    💎 ML Diamonds
-  </h2>
-
-</div>
-
-
-<div class="price-card dia">
-
-  <div class="price-head dia">
-    💎 MLBB Diamonds
-  </div>
-
-  <div id="diaHomeList"></div>
-
-</div>
-
-
-<div class="trust">
-
-  <div class="trust-item">
-    <div>🛡️</div>
-    <span>SAFE SERVICE</span>
-  </div>
-
-  <div class="trust-item">
-    <div>⚡</div>
-    <span>FAST DELIVERY</span>
-  </div>
-
-  <div class="trust-item">
-    <div>💯</div>
-    <span>TRUSTED SHOP</span>
-  </div>
-
-</div>
-
-
-</div>
-
-
-<!-- UC PAGE -->
-
-<div id="ucPage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-  <h2>
-    🎮 PUBG UC
-  </h2>
-
-  <p style="color:#888;font-size:11px">
-    📌 All Server UC Price
-  </p>
-
-  <div id="ucPageList"></div>
-
-</div>
-
-
-<!-- PREMIUM PAGE -->
-
-<div id="premiumPage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-  <h2>
-    👑 Telegram Premium
-  </h2>
-
-  <div id="premiumPageList"></div>
-
-</div>
-
-
-<!-- DIA PAGE -->
-
-<div id="diaPage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-  <h2>
-    💎 ML Diamonds
-  </h2>
-
-  <div id="diaPageList"></div>
-
-</div>
-
-
-<!-- ORDER PAGE -->
-
-<div id="orderPage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-  <h2>
-    🛒 Create Order
-  </h2>
-
-
-  <div class="form-box">
-
-
-    <label>
-      Product
-    </label>
-
-    <input
-      id="orderProduct"
-      readonly>
-
-
-    <label>
-      Price
-    </label>
-
-    <input
-      id="orderPrice"
-      readonly>
-
-
-    <label>
-      Player ID / Username
-    </label>
-
-    <input
-      id="playerId"
-      placeholder="Enter Player ID">
-
-
-    <label>
-      Server ID
-    </label>
-
-    <input
-      id="serverId"
-      placeholder="Enter Server ID">
-
-
-    <label>
-      Payment Method
-    </label>
-
-    <select id="payment">
-
-      <option>
-        Manual Payment
-      </option>
-
-      <option>
-        KBZ Pay
-      </option>
-
-      <option>
-        Wave Pay
-      </option>
-
-      <option>
-        USDT
-      </option>
-
-    </select>
-
-
-    <button
-      class="confirm"
-      onclick="submitOrder()">
-
-      🛒 CONFIRM ORDER
-
-    </button>
-
-
-  </div>
-
-</div>
-
-
-<!-- ORDERS -->
-
-<div id="ordersPage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-  <h2>
-    📦 My Orders
-  </h2>
-
-  <div id="ordersList"></div>
-
-</div>
-
-
-<!-- PROFILE -->
-
-<div id="profilePage" class="page">
-
-  <div
-    class="back"
-    onclick="openPage('homePage')">
-
-    ← Back
-
-  </div>
-
-
-  <div
-    class="form-box"
-    style="text-align:center">
-
-    <img
-      id="profileImage"
-      src="https://commons.wikimedia.org/wiki/Special:FilePath/Central_Cee.jpg"
-      style="
-        width:90px;
-        height:90px;
-        object-fit:cover;
-        border-radius:50%;
-        border:2px solid #ff1744;
-      ">
-
-
-    <h2 id="profileName">
-      Telegram User
-    </h2>
-
-
-    <p
-      id="profileUsername"
-      style="
-        color:#888;
-        font-size:12px;
-      ">
-    </p>
-
-
-    <p
-      style="
-        color:#777;
-        font-size:10px;
-      ">
-
-      Welcome to Central Shop
-
-    </p>
-
-  </div>
-
-</div>
-
-
-</div>
-
-
-<!-- BOTTOM NAV -->
-
-<div class="bottom-nav">
-
-
-<div
-  class="nav-item active"
-  onclick="openPage('homePage')">
-
-  <div class="nav-icon">
-    🏠
-  </div>
-
-  HOME
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="openPage('diaPage')">
-
-  <div class="nav-icon">
-    💎
-  </div>
-
-  DIAMONDS
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="openPage('premiumPage')">
-
-  <div class="nav-icon">
-    👑
-  </div>
-
-  PREMIUM
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="openPage('ucPage')">
-
-  <div class="nav-icon">
-    🎮
-  </div>
-
-  PUBG UC
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="showComingSoon('Telegram Stars')">
-
-  <div class="nav-icon">
-    ⭐
-  </div>
-
-  TG STAR
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="showOrders()">
-
-  <div class="nav-icon">
-    📦
-  </div>
-
-  MY ORDER
-
-</div>
-
-
-<div
-  class="nav-item"
-  onclick="openProfile()">
-
-  <div class="nav-icon">
-    👤
-  </div>
-
-  PROFILE
-
-</div>
-
-
-</div>
-
-
-<script>
+/*************************************************
+ * CENTRAL SHOP - GOOGLE APPS SCRIPT
+ *************************************************/
+
+const SHEET_NAME = "Orders";
+
+/*
+ * IMPORTANT
+ * ဒီ ၂ ခုကို ကိုယ့်အချက်အလက်နဲ့ ပြောင်းပါ။
+ */
+const BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+const ADMIN_CHAT_ID = "YOUR_ADMIN_CHAT_ID";
 
 
 /*************************************************
- * TELEGRAM
+ * GET SHEET
  *************************************************/
 
-const tg =
-  window.Telegram.WebApp;
+function getSheet() {
 
-tg.ready();
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
 
-tg.expand();
+  let sheet =
+    ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+
+    sheet =
+      ss.insertSheet(SHEET_NAME);
+
+    sheet.appendRow([
+      "Order ID",
+      "Telegram ID",
+      "Username",
+      "Product",
+      "Price",
+      "Player ID",
+      "Server ID",
+      "Payment",
+      "Status",
+      "Created At",
+      "Updated At"
+    ]);
+
+  }
+
+  return sheet;
+}
 
 
 /*************************************************
- * APPS SCRIPT URL
+ * DO GET
  *************************************************/
 
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxwxYODUmXAWE8UWL8Ghg29fUcQMr6hVpMVQFhxrO8H7BfVPLIStobQRGdqQ2ePoLlN/exec";
+function doGet(e) {
+
+  try {
+
+    const action =
+      e &&
+      e.parameter &&
+      e.parameter.action
+        ? e.parameter.action
+        : "";
+
+    if (action === "getOrders") {
+
+      return jsonOutput(
+        getOrders(
+          e.parameter.telegramId
+        )
+      );
+
+    }
+
+    if (action === "getOrder") {
+
+      return jsonOutput(
+        getOrder(
+          e.parameter.orderId
+        )
+      );
+
+    }
+
+    return jsonOutput({
+      success: true,
+      message: "Central Shop API is running."
+    });
+
+  }
+
+  catch (error) {
+
+    return jsonOutput({
+      success: false,
+      error: error.toString()
+    });
+
+  }
+
+}
 
 
 /*************************************************
- * PRICE DATA
+ * DO POST
  *************************************************/
 
-const UC = [
+function doPost(e) {
 
-  ["60 UC","4,100 Ks"],
-  ["180 UC","12,200 Ks"],
-  ["325 UC","20,300 Ks"],
-  ["385 UC","24,400 Ks"],
-  ["660 UC","40,500 Ks"],
-  ["720 UC","44,600 Ks"],
-  ["985 UC","60,700 Ks"],
-  ["1320 UC","81,100 Ks"],
-  ["1800 UC","101,600 Ks"],
-  ["3850 UC","200,600 Ks"],
-  ["8100 UC","393,700 Ks"]
+  try {
 
-];
+    if (!e || !e.postData) {
 
+      return jsonOutput({
+        success: false,
+        error: "No POST data."
+      });
 
-const PREMIUM = [
+    }
 
-  ["⭐ 1 Month","25,000 Ks"],
-  ["🎁 3 Months","60,000 Ks"],
-  ["🎁 6 Months","85,000 Ks"],
-  ["🎁 12 Months","145,000 Ks"]
+    const data =
+      JSON.parse(
+        e.postData.contents
+      );
 
-];
+    const action =
+      data.action || "";
 
 
-const DIAMONDS = [
+    /***********************************************
+     * CREATE ORDER
+     ***********************************************/
 
-  ["5 Diamonds (Regular)","500 MMK"],
-  ["11 Diamonds (Regular)","1,000 MMK"],
-  ["22 Diamonds (Regular)","2,000 MMK"],
-  ["86 Diamonds (Regular)","6,000 MMK"],
-  ["175 Diamonds (Regular)","11,500 MMK"],
-  ["257 Diamonds (Regular)","16,500 MMK"],
-  ["343 Diamonds (Regular)","22,000 MMK"],
-  ["429 Diamonds (Regular)","27,500 MMK"],
-  ["515 Diamonds (Regular)","33,000 MMK"],
-  ["600 Diamonds (Regular)","38,000 MMK"],
-  ["706 Diamonds (Regular)","44,000 MMK"],
-  ["1049 Diamonds (Regular)","67,000 MMK"],
-  ["1135 Diamonds (Regular)","71,000 MMK"],
-  ["2195 Diamonds (Regular)","140,000 MMK"],
-  ["Weekly Pass (Special)","6,600 MMK"],
-  ["Twilight Pass (Special)","38,000 MMK"],
-  ["50+50 (Bonus)","4,000 MMK"],
-  ["150+150 (Bonus)","11,000 MMK"],
-  ["250+250 (Bonus)","17,500 MMK"],
-  ["500+500 (Bonus)","35,500 MMK"]
+    if (
+      action === "createOrder"
+    ) {
 
-];
+      return jsonOutput(
+        createOrder(data)
+      );
+
+    }
+
+
+    /***********************************************
+     * APPROVE ORDER
+     ***********************************************/
+
+    if (
+      action === "approveOrder"
+    ) {
+
+      return jsonOutput(
+        updateOrderStatus(
+          data.orderId,
+          "SUCCESS"
+        )
+      );
+
+    }
+
+
+    /***********************************************
+     * CANCEL ORDER
+     ***********************************************/
+
+    if (
+      action === "cancelOrder"
+    ) {
+
+      return jsonOutput(
+        updateOrderStatus(
+          data.orderId,
+          "FAILED"
+        )
+      );
+
+    }
+
+
+    return jsonOutput({
+
+      success: false,
+
+      error:
+        "Unknown action: " +
+        action
+
+    });
+
+  }
+
+  catch (error) {
+
+    return jsonOutput({
+
+      success: false,
+
+      error:
+        error.toString()
+
+    });
+
+  }
+
+}
 
 
 /*************************************************
- * RENDER
+ * CREATE ORDER
  *************************************************/
 
-function renderList(
-  data,
-  elementId
-) {
+function createOrder(data) {
 
-  const el =
-    document.getElementById(
-      elementId
-    );
+  const sheet =
+    getSheet();
 
-  if (!el) return;
+  const orderId =
+    "CS" +
+    Date.now();
 
-  el.innerHTML = "";
+  const now =
+    new Date();
 
 
-  data.forEach(item => {
+  sheet.appendRow([
 
-    const row =
-      document.createElement(
-        "div"
-      );
+    orderId,
 
-    row.className =
-      "price-row";
+    data.telegramId || "",
 
+    data.username || "",
 
-    const name =
-      document.createElement(
-        "div"
-      );
+    data.product || "",
 
-    name.className =
-      "product-name";
+    data.price || "",
 
-    name.innerText =
-      item[0];
+    data.playerId || "",
 
+    data.serverId || "",
 
-    const price =
-      document.createElement(
-        "div"
-      );
+    data.payment || "",
 
-    price.className =
-      "product-price";
+    "PENDING",
 
-    price.innerText =
-      item[1];
+    now,
+
+    now
+
+  ]);
 
 
-    const button =
-      document.createElement(
-        "button"
-      );
+  /***********************************************
+   * SEND ORDER TO ADMIN
+   ***********************************************/
 
-    button.className =
-      "buy-btn";
+  sendOrderToAdmin({
 
-    button.innerText =
-      "BUY";
+    orderId:
+      orderId,
 
+    telegramId:
+      data.telegramId || "",
 
-    button.onclick =
-      function() {
+    username:
+      data.username || "",
 
-        buyProduct(
-          item[0],
-          item[1]
-        );
+    product:
+      data.product || "",
 
-      };
+    price:
+      data.price || "",
 
+    playerId:
+      data.playerId || "",
 
-    row.appendChild(name);
+    serverId:
+      data.serverId || "",
 
-    row.appendChild(price);
-
-    row.appendChild(button);
-
-    el.appendChild(row);
+    payment:
+      data.payment || ""
 
   });
 
+
+  return {
+
+    success: true,
+
+    orderId:
+      orderId,
+
+    status:
+      "PENDING"
+
+  };
+
 }
 
 
 /*************************************************
- * INIT
+ * UPDATE ORDER STATUS
  *************************************************/
 
-renderList(
-  UC,
-  "ucHomeList"
-);
-
-renderList(
-  UC,
-  "ucPageList"
-);
-
-
-renderList(
-  PREMIUM,
-  "premiumHomeList"
-);
-
-renderList(
-  PREMIUM,
-  "premiumPageList"
-);
-
-
-renderList(
-  DIAMONDS,
-  "diaHomeList"
-);
-
-renderList(
-  DIAMONDS,
-  "diaPageList"
-);
-
-
-/*************************************************
- * PAGE
- *************************************************/
-
-function openPage(
-  pageId
+function updateOrderStatus(
+  orderId,
+  newStatus
 ) {
 
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      page =>
-        page.classList
-          .remove("active")
-    );
+  if (!orderId) {
 
+    return {
 
-  const page =
-    document.getElementById(
-      pageId
-    );
+      success: false,
 
+      error:
+        "Order ID is missing."
 
-  if (page) {
-
-    page.classList
-      .add("active");
-
-    window.scrollTo(
-      {
-        top: 0,
-        behavior: "smooth"
-      }
-    );
+    };
 
   }
+
+
+  const sheet =
+    getSheet();
+
+  const values =
+    sheet
+      .getDataRange()
+      .getValues();
+
+
+  for (
+    let i = 1;
+    i < values.length;
+    i++
+  ) {
+
+    const rowOrderId =
+      String(values[i][0]);
+
+
+    if (
+      rowOrderId ===
+      String(orderId)
+    ) {
+
+      /*
+       * Column I = Status
+       */
+      sheet
+        .getRange(i + 1, 9)
+        .setValue(newStatus);
+
+
+      /*
+       * Column K = Updated At
+       */
+      sheet
+        .getRange(i + 1, 11)
+        .setValue(new Date());
+
+
+      const telegramId =
+        String(values[i][1]);
+
+
+      const product =
+        values[i][3];
+
+
+      const price =
+        values[i][4];
+
+
+      /*
+       * Send notification to customer
+       */
+      sendCustomerStatus(
+
+        telegramId,
+
+        orderId,
+
+        product,
+
+        price,
+
+        newStatus
+
+      );
+
+
+      return {
+
+        success: true,
+
+        orderId:
+          orderId,
+
+        status:
+          newStatus
+
+      };
+
+    }
+
+  }
+
+
+  return {
+
+    success: false,
+
+    error:
+      "Order not found: " +
+      orderId
+
+  };
 
 }
 
 
 /*************************************************
- * BUY
+ * GET CUSTOMER ORDERS
  *************************************************/
 
-function buyProduct(
-  product,
-  price
+function getOrders(
+  telegramId
 ) {
 
-  document
-    .getElementById(
-      "orderProduct"
-    )
-    .value =
-      product;
+  const sheet =
+    getSheet();
+
+  const values =
+    sheet
+      .getDataRange()
+      .getValues();
 
 
-  document
-    .getElementById(
-      "orderPrice"
-    )
-    .value =
-      price;
+  const orders = [];
 
 
-  document
-    .getElementById(
-      "playerId"
-    )
-    .value = "";
+  for (
+    let i = 1;
+    i < values.length;
+    i++
+  ) {
+
+    const row =
+      values[i];
 
 
-  document
-    .getElementById(
-      "serverId"
-    )
-    .value = "";
+    if (
+      String(row[1]) ===
+      String(telegramId)
+    ) {
+
+      orders.push({
+
+        id:
+          String(row[0]),
+
+        telegramId:
+          String(row[1]),
+
+        username:
+          String(row[2] || ""),
+
+        product:
+          String(row[3] || ""),
+
+        price:
+          String(row[4] || ""),
+
+        player:
+          String(row[5] || ""),
+
+        server:
+          String(row[6] || ""),
+
+        payment:
+          String(row[7] || ""),
+
+        status:
+          String(row[8] || "PENDING"),
+
+        time:
+          formatDate(row[9]),
+
+        updatedAt:
+          formatDate(row[10])
+
+      });
+
+    }
+
+  }
 
 
-  openPage(
-    "orderPage"
-  );
+  /*
+   * Newest first
+   */
+  orders.reverse();
+
+
+  return {
+
+    success: true,
+
+    orders:
+      orders
+
+  };
 
 }
 
 
 /*************************************************
- * SUBMIT ORDER
+ * GET SINGLE ORDER
  *************************************************/
 
-function submitOrder() {
+function getOrder(
+  orderId
+) {
+
+  const sheet =
+    getSheet();
+
+  const values =
+    sheet
+      .getDataRange()
+      .getValues();
 
 
-  const product =
-    document
-      .getElementById(
-        "orderProduct"
-      )
-      .value;
+  for (
+    let i = 1;
+    i < values.length;
+    i++
+  ) {
+
+    const row =
+      values[i];
 
 
-  const price =
-    document
-      .getElementById(
-        "orderPrice"
-      )
-      .value;
+    if (
+      String(row[0]) ===
+      String(orderId)
+    ) {
 
+      return {
 
-  const playerId =
-    document
-      .getElementById(
-        "playerId"
-      )
-      .value
-      .trim();
+        success: true,
 
+        order: {
 
-  const serverId =
-    document
-      .getElementById(
-        "serverId"
-      )
-      .value
-      .trim();
+          id:
+            String(row[0]),
 
+          telegramId:
+            String(row[1]),
 
-  const payment =
-    document
-      .getElementById(
-        "payment"
-      )
-      .value;
+          username:
+            String(row[2] || ""),
 
+          product:
+            String(row[3] || ""),
 
-  if (!playerId) {
+          price:
+            String(row[4] || ""),
 
-    tg.showAlert(
-      "⚠️ Please enter Player ID / Username"
-    );
+          player:
+            String(row[5] || ""),
 
-    return;
+          server:
+            String(row[6] || ""),
 
-  }
+          payment:
+            String(row[7] || ""),
 
+          status:
+            String(row[8] || "PENDING"),
 
-  const user =
-    tg.initDataUnsafe &&
-    tg.initDataUnsafe.user
-      ? tg.initDataUnsafe.user
-      : null;
+          time:
+            formatDate(row[9]),
 
+          updatedAt:
+            formatDate(row[10])
 
-  const telegramId =
-    user
-      ? String(user.id)
-      : "";
+        }
 
+      };
 
-  const username =
-    user &&
-    user.username
-      ? user.username
-      : "";
-
-
-  if (!telegramId) {
-
-    tg.showAlert(
-      "⚠️ Please open this shop from Telegram."
-    );
-
-    return;
+    }
 
   }
 
 
-  const button =
-    document.querySelector(
-      ".confirm"
-    );
+  return {
+
+    success: false,
+
+    error:
+      "Order not found."
+
+  };
+
+}
 
 
-  if (button) {
+/*************************************************
+ * SEND ORDER TO ADMIN
+ *************************************************/
 
-    button.disabled =
-      true;
+function sendOrderToAdmin(
+  order
+) {
 
-    button.innerText =
-      "⏳ SENDING ORDER...";
+  const text =
 
-  }
+    "🔔 NEW CENTRAL SHOP ORDER\n\n" +
+
+    "📦 Order ID:\n" +
+    order.orderId +
+
+    "\n\n" +
+
+    "👤 Customer:\n" +
+    (
+      order.username
+        ? "@" + order.username
+        : "Telegram User"
+    ) +
+
+    "\n\n" +
+
+    "🆔 Telegram ID:\n" +
+    order.telegramId +
+
+    "\n\n" +
+
+    "🎮 Product:\n" +
+    order.product +
+
+    "\n\n" +
+
+    "💰 Price:\n" +
+    order.price +
+
+    "\n\n" +
+
+    "🎮 Player ID:\n" +
+    order.playerId +
+
+    "\n\n" +
+
+    "🌐 Server ID:\n" +
+    (
+      order.serverId ||
+      "-"
+    ) +
+
+    "\n\n" +
+
+    "💳 Payment:\n" +
+    order.payment +
+
+    "\n\n" +
+
+    "⏳ Status: PENDING";
 
 
-  const orderData = {
+  const keyboard = {
 
-    action:
-      "createOrder",
+    inline_keyboard: [
 
-    telegramId:
-      telegramId,
+      [
 
-    username:
-      username,
+        {
 
-    product:
-      product,
+          text:
+            "✅ အတည်ပြု",
 
-    price:
-      price,
+          callback_data:
+            "approve:" +
+            order.orderId
 
-    playerId:
-      playerId,
+        },
 
-    serverId:
-      serverId,
+        {
 
-    payment:
-      payment
+          text:
+            "❌ ပယ်ဖျက်",
+
+          callback_data:
+            "cancel:" +
+            order.orderId
+
+        }
+
+      ]
+
+    ]
 
   };
 
 
-  fetch(
-    APPS_SCRIPT_URL,
-    {
+  telegramSendMessage(
 
-      method:
-        "POST",
+    ADMIN_CHAT_ID,
 
-      headers:
-        {
-          "Content-Type":
-            "text/plain;charset=utf-8"
-        },
+    text,
 
-      body:
-        JSON.stringify(
-          orderData
-        )
+    keyboard
 
-    }
-  )
-
-
-  .then(
-    response =>
-      response.json()
-  )
-
-
-  .then(
-    result => {
-
-
-      if (
-        result.success
-      ) {
-
-
-        saveLocalOrder({
-
-          id:
-            result.orderId,
-
-          product:
-            product,
-
-          price:
-            price,
-
-          player:
-            playerId,
-
-          server:
-            serverId,
-
-          payment:
-            payment,
-
-          status:
-            "PENDING",
-
-          time:
-            new Date()
-              .toLocaleString()
-
-        });
-
-
-        tg.showAlert(
-
-          "✅ ORDER CREATED!\n\n" +
-
-          "📦 Order ID:\n" +
-          result.orderId +
-
-          "\n\n🎮 Product:\n" +
-          product +
-
-          "\n\n💰 Price:\n" +
-          price +
-
-          "\n\n⏳ Status: PENDING\n\n" +
-
-          "👤 Admin will confirm your order."
-
-        );
-
-
-        openPage(
-          "ordersPage"
-        );
-
-        showOrders();
-
-      }
-
-      else {
-
-        tg.showAlert(
-
-          "❌ ORDER FAILED\n\n" +
-
-          (
-            result.error ||
-            "Unknown error"
-          )
-
-        );
-
-      }
-
-    }
-  )
-
-
-  .catch(
-    error => {
-
-      console.error(
-        error
-      );
-
-      tg.showAlert(
-
-        "❌ CONNECTION ERROR\n\n" +
-
-        "Please try again."
-
-      );
-
-    }
-  )
-
-
-  .finally(
-    () => {
-
-      if (button) {
-
-        button.disabled =
-          false;
-
-        button.innerText =
-          "🛒 CONFIRM ORDER";
-
-      }
-
-    }
   );
 
 }
 
 
 /*************************************************
- * LOCAL ORDER STORAGE
+ * TELEGRAM CALLBACK
  *************************************************/
 
-function saveLocalOrder(
-  order
+function doTelegramCallback(
+  callback
 ) {
 
-  let orders =
-    JSON.parse(
-      localStorage.getItem(
-        "central_orders"
-      ) || "[]"
+  const data =
+    callback.data || "";
+
+
+  const parts =
+    data.split(":");
+
+
+  const action =
+    parts[0];
+
+
+  const orderId =
+    parts.slice(1).join(":");
+
+
+  let result;
+
+
+  if (
+    action === "approve"
+  ) {
+
+    result =
+      updateOrderStatus(
+        orderId,
+        "SUCCESS"
+      );
+
+  }
+
+  else if (
+    action === "cancel"
+  ) {
+
+    result =
+      updateOrderStatus(
+        orderId,
+        "FAILED"
+      );
+
+  }
+
+  else {
+
+    result = {
+
+      success: false,
+
+      error:
+        "Unknown callback."
+
+    };
+
+  }
+
+
+  /*
+   * Update admin message
+   */
+
+  if (
+    result.success
+  ) {
+
+    telegramAnswerCallback(
+
+      callback.id,
+
+      action === "approve"
+        ? "✅ Order အောင်မြင်စွာ အတည်ပြုပြီးပါပြီ"
+        : "❌ Order ပယ်ဖျက်ပြီးပါပြီ"
+
     );
 
+  }
 
-  orders.unshift(
-    order
-  );
+  else {
 
+    telegramAnswerCallback(
 
-  localStorage.setItem(
-    "central_orders",
-    JSON.stringify(
-      orders
-    )
-  );
+      callback.id,
+
+      "⚠️ " +
+      result.error
+
+    );
+
+  }
 
 }
 
 
 /*************************************************
- * SHOW ORDERS
+ * TELEGRAM WEBHOOK
  *************************************************/
 
-function showOrders() {
+function doPostTelegram(e) {
 
-  openPage(
-    "ordersPage"
-  );
+  try {
+
+    const update =
+      JSON.parse(
+        e.postData.contents
+      );
 
 
-  const box =
-    document.getElementById(
-      "ordersList"
+    if (
+      update.callback_query
+    ) {
+
+      doTelegramCallback(
+        update.callback_query
+      );
+
+    }
+
+
+    return ContentService
+      .createTextOutput("OK");
+
+  }
+
+  catch (error) {
+
+    return ContentService
+      .createTextOutput("ERROR");
+
+  }
+
+}
+
+
+/*************************************************
+ * TELEGRAM SEND MESSAGE
+ *************************************************/
+
+function telegramSendMessage(
+  chatId,
+  text,
+  keyboard
+) {
+
+  if (
+    !BOT_TOKEN ||
+    BOT_TOKEN ===
+      "YOUR_TELEGRAM_BOT_TOKEN"
+  ) {
+
+    console.log(
+      "BOT_TOKEN not configured."
     );
-
-
-  let orders =
-    JSON.parse(
-      localStorage.getItem(
-        "central_orders"
-      ) || "[]"
-    );
-
-
-  if (!orders.length) {
-
-    box.innerHTML = `
-
-      <div
-        class="form-box"
-        style="text-align:center">
-
-        <div
-          style="font-size:40px">
-          📦
-        </div>
-
-        <h3>
-          No Orders Yet
-        </h3>
-
-        <p
-          style="
-            color:#777;
-            font-size:11px;
-          ">
-
-          Your orders will appear here.
-
-        </p>
-
-      </div>
-
-    `;
 
     return;
 
   }
 
 
-  box.innerHTML = "";
+  const url =
+    "https://api.telegram.org/bot" +
+    BOT_TOKEN +
+    "/sendMessage";
 
 
-  orders.forEach(
-    order => {
+  const payload = {
 
-      const card =
-        document.createElement(
-          "div"
-        );
+    chat_id:
+      chatId,
 
+    text:
+      text,
 
-      card.className =
-        "order-card";
+    parse_mode:
+      "HTML",
 
+    reply_markup:
+      JSON.stringify(
+        keyboard
+      )
 
-      card.innerHTML = `
-
-        <div
-          style="
-            display:flex;
-            justify-content:space-between;
-            gap:10px;
-          ">
-
-          <b>
-            📦 ${order.id}
-          </b>
-
-          <span
-            class="status">
-
-            ${order.status}
-
-          </span>
-
-        </div>
+  };
 
 
-        <hr
-          style="
-            border-color:#222;
-            border-width:0 0 1px;
-          ">
+  UrlFetchApp.fetch(
 
+    url,
 
-        <p
-          style="
-            font-size:12px;
-            font-weight:bold;
-          ">
+    {
 
-          🎮 ${order.product}
+      method:
+        "post",
 
-        </p>
+      contentType:
+        "application/json",
 
+      payload:
+        JSON.stringify(
+          payload
+        ),
 
-        <p
-          style="
-            color:#ffca28;
-            font-weight:bold;
-          ">
-
-          💰 ${order.price}
-
-        </p>
-
-
-        <p
-          style="
-            color:#888;
-            font-size:10px;
-          ">
-
-          🆔 Player:
-          ${order.player}
-
-        </p>
-
-
-        <p
-          style="
-            color:#888;
-            font-size:10px;
-          ">
-
-          🌐 Server:
-          ${order.server || "-"}
-
-        </p>
-
-
-        <p
-          style="
-            color:#888;
-            font-size:10px;
-          ">
-
-          💳 ${order.payment}
-
-        </p>
-
-      `;
-
-
-      box.appendChild(
-        card
-      );
+      muteHttpExceptions:
+        true
 
     }
+
   );
 
 }
 
 
 /*************************************************
- * PROFILE
+ * TELEGRAM CALLBACK ANSWER
  *************************************************/
 
-function openProfile() {
+function telegramAnswerCallback(
+  callbackId,
+  text
+) {
 
-  openPage(
-    "profilePage"
+  if (
+    !BOT_TOKEN ||
+    BOT_TOKEN ===
+      "YOUR_TELEGRAM_BOT_TOKEN"
+  ) {
+
+    return;
+
+  }
+
+
+  const url =
+    "https://api.telegram.org/bot" +
+    BOT_TOKEN +
+    "/answerCallbackQuery";
+
+
+  const payload = {
+
+    callback_query_id:
+      callbackId,
+
+    text:
+      text,
+
+    show_alert:
+      false
+
+  };
+
+
+  UrlFetchApp.fetch(
+
+    url,
+
+    {
+
+      method:
+        "post",
+
+      contentType:
+        "application/json",
+
+      payload:
+        JSON.stringify(
+          payload
+        ),
+
+      muteHttpExceptions:
+        true
+
+    }
+
   );
 
-
-  const user =
-    tg.initDataUnsafe &&
-    tg.initDataUnsafe.user
-      ? tg.initDataUnsafe.user
-      : null;
+}
 
 
-  if (!user) return;
+/*************************************************
+ * CUSTOMER NOTIFICATION
+ *************************************************/
+
+function sendCustomerStatus(
+
+  telegramId,
+
+  orderId,
+
+  product,
+
+  price,
+
+  status
+
+) {
+
+  if (!telegramId) return;
 
 
-  const fullName =
-
-    (
-      user.first_name ||
-      ""
-    ) +
-
-    " " +
-
-    (
-      user.last_name ||
-      ""
-    );
-
-
-  document
-    .getElementById(
-      "profileName"
-    )
-    .innerText =
-      fullName.trim() ||
-      "Telegram User";
-
-
-  document
-    .getElementById(
-      "profileUsername"
-    )
-    .innerText =
-      user.username
-        ? "@" +
-          user.username
-        : "No username";
+  let text = "";
 
 
   if (
-    user.photo_url
+    status ===
+    "SUCCESS"
   ) {
 
-    document
-      .getElementById(
-        "profileImage"
-      )
-      .src =
-        user.photo_url;
+    text =
+
+      "✅ <b>ORDER SUCCESS</b>\n\n" +
+
+      "📦 Order ID:\n" +
+      orderId +
+
+      "\n\n" +
+
+      "🎮 Product:\n" +
+      product +
+
+      "\n\n" +
+
+      "💰 Price:\n" +
+      price +
+
+      "\n\n" +
+
+      "🎉 Your order has been successfully completed.";
+
+  }
+
+
+  else if (
+    status ===
+    "FAILED"
+  ) {
+
+    text =
+
+      "❌ <b>ORDER FAILED</b>\n\n" +
+
+      "📦 Order ID:\n" +
+      orderId +
+
+      "\n\n" +
+
+      "🎮 Product:\n" +
+      product +
+
+      "\n\n" +
+
+      "💰 Price:\n" +
+      price +
+
+      "\n\n" +
+
+      "⚠️ Your order was not successful.";
+
+  }
+
+
+  else {
+
+    text =
+
+      "⏳ <b>ORDER PENDING</b>\n\n" +
+
+      "📦 Order ID:\n" +
+      orderId;
+
+  }
+
+
+  telegramSendMessage(
+
+    telegramId,
+
+    text,
+
+    null
+
+  );
+
+}
+
+
+/*************************************************
+ * FORMAT DATE
+ *************************************************/
+
+function formatDate(
+  value
+) {
+
+  if (!value) return "";
+
+
+  try {
+
+    return Utilities
+      .formatDate(
+
+        new Date(value),
+
+        Session
+          .getScriptTimeZone(),
+
+        "yyyy-MM-dd HH:mm:ss"
+
+      );
+
+  }
+
+  catch (e) {
+
+    return String(value);
 
   }
 
@@ -2410,21 +1149,55 @@ function openProfile() {
 
 
 /*************************************************
- * COMING SOON
+ * JSON OUTPUT
  *************************************************/
 
-function showComingSoon(
-  name
+function jsonOutput(
+  data
 ) {
 
-  tg.showAlert(
-    name +
-    " section is coming soon."
-  );
+  return ContentService
+
+    .createTextOutput(
+      JSON.stringify(data)
+    )
+
+    .setMimeType(
+      ContentService.MimeType.JSON
+    );
 
 }
 
-</script>
 
-</body>
-</html>
+/*************************************************
+ * WEBHOOK SETUP
+ *************************************************/
+
+function setTelegramWebhook() {
+
+  const webAppUrl =
+    ScriptApp
+      .getService()
+      .getUrl();
+
+
+  const url =
+    "https://api.telegram.org/bot" +
+    BOT_TOKEN +
+    "/setWebhook?url=" +
+    encodeURIComponent(
+      webAppUrl
+    );
+
+
+  const response =
+    UrlFetchApp.fetch(
+      url
+    );
+
+
+  Logger.log(
+    response.getContentText()
+  );
+
+}
