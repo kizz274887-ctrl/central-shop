@@ -1,685 +1,187 @@
-const SPREADSHEET_ID = "1vEcv2JswTbKzgBZMdxY1qxl5o-dAF9WouM56EQFNbkc";
-const ADMIN_ID = "8758413326";
-const BOT_TOKEN = "PASTE_NEW_BOT_TOKEN_HERE";
-
-const ADMIN_USERNAME = "@area_502";
-const TIMEZONE = "Asia/Bangkok";
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzUJkxWhweDv7RWS3DBrAB8wkS-tplIX6R77w8sIJ6FpknJqH6x4NFyVC8JOZAWjSbBlw/exec";
 
 
-/* ==================================================
-   GOOGLE SHEET
-================================================== */
+function submitOrder() {
 
-function getSheet() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheets()[0];
+  const product =
+    document.getElementById("orderProduct").value;
 
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
-      "Order ID",
-      "Time",
-      "Telegram ID",
-      "Username",
-      "Product",
-      "Price",
-      "Player ID",
-      "Server ID",
-      "Payment",
-      "Status"
-    ]);
+  const price =
+    document.getElementById("orderPrice").value;
+
+  const playerId =
+    document.getElementById("playerId").value.trim();
+
+  const serverId =
+    document.getElementById("serverId").value.trim();
+
+  const payment =
+    document.getElementById("payment").value;
+
+
+  if (!playerId) {
+
+    tg.showAlert(
+      "⚠️ Please enter Player ID / Username"
+    );
+
+    return;
   }
 
-  return sheet;
-}
 
+  /* Telegram User */
 
-/* ==================================================
-   TELEGRAM API
-================================================== */
+  const user =
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user
+      ? tg.initDataUnsafe.user
+      : null;
 
-function telegram(method, data) {
-
-  const url =
-    "https://api.telegram.org/bot" +
-    BOT_TOKEN +
-    "/" +
-    method;
-
-  const response = UrlFetchApp.fetch(url, {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(data),
-    muteHttpExceptions: true
-  });
-
-  return JSON.parse(response.getContentText());
-}
-
-
-/* ==================================================
-   TEST BOT
-================================================== */
-
-function testBot() {
-
-  const result = telegram("sendMessage", {
-    chat_id: ADMIN_ID,
-    text:
-      "✅ CENTRAL SHOP BOT CONNECTED!\n\n" +
-      "👤 Admin ID: " + ADMIN_ID + "\n" +
-      "👤 Admin: " + ADMIN_USERNAME + "\n\n" +
-      "🛍️ Backend is ready."
-  });
-
-  Logger.log(result);
-}
-
-
-/* ==================================================
-   CREATE ORDER
-================================================== */
-
-function createOrder(data) {
-
-  const sheet = getSheet();
-
-  const orderId = "CS" + Date.now();
-
-  const time = new Date().toLocaleString("en-US", {
-    timeZone: TIMEZONE
-  });
 
   const telegramId =
-    String(data.telegramId || "");
+    user
+      ? String(user.id)
+      : "";
+
 
   const username =
-    String(data.username || "");
-
-  const customer =
-    username
-      ? "@" + username
-      : "Telegram User";
+    user && user.username
+      ? user.username
+      : "";
 
 
-  /* SAVE TO GOOGLE SHEET */
+  if (!telegramId) {
 
-  sheet.appendRow([
-    orderId,
-    time,
-    telegramId,
-    username,
-    data.product || "",
-    data.price || "",
-    data.playerId || "",
-    data.serverId || "",
-    data.payment || "",
-    "PENDING"
-  ]);
+    tg.showAlert(
+      "⚠️ Please open this shop from Telegram."
+    );
+
+    return;
+  }
 
 
-  /* ADMIN MESSAGE */
+  /* Prevent double click */
 
-  const message =
+  const button =
+    document.querySelector(".confirm");
 
-    "🔔 NEW CENTRAL SHOP ORDER\n\n" +
+  if (button) {
 
-    "📦 Order ID:\n" +
-    orderId +
-    "\n\n" +
+    button.disabled = true;
 
-    "👤 Customer:\n" +
-    customer +
-    "\n\n" +
+    button.innerText =
+      "⏳ SENDING ORDER...";
 
-    "🆔 Telegram ID:\n" +
-    telegramId +
-    "\n\n" +
-
-    "🎮 Product:\n" +
-    (data.product || "-") +
-    "\n\n" +
-
-    "💰 Price:\n" +
-    (data.price || "-") +
-    "\n\n" +
-
-    "🎮 Player ID:\n" +
-    (data.playerId || "-") +
-    "\n\n" +
-
-    "🌐 Server ID:\n" +
-    (data.serverId || "-") +
-    "\n\n" +
-
-    "💳 Payment:\n" +
-    (data.payment || "-") +
-    "\n\n" +
-
-    "⏳ Status: PENDING";
+  }
 
 
-  /* ADMIN BUTTONS */
+  const orderData = {
 
-  const keyboard = {
+    action: "createOrder",
 
-    inline_keyboard: [
+    telegramId: telegramId,
 
-      [
-        {
-          text: "✅ APPROVE",
-          callback_data: "approve|" + orderId
-        },
+    username: username,
 
-        {
-          text: "❌ REJECT",
-          callback_data: "reject|" + orderId
-        }
-      ],
+    product: product,
 
-      [
-        {
-          text: "⚙️ PROCESSING",
-          callback_data: "processing|" + orderId
-        }
-      ],
+    price: price,
 
-      [
-        {
-          text: "🎉 COMPLETED",
-          callback_data: "completed|" + orderId
-        }
-      ]
+    playerId: playerId,
 
-    ]
+    serverId: serverId,
+
+    payment: payment
 
   };
 
 
-  /* SEND TO ADMIN */
+  fetch(APPS_SCRIPT_URL, {
 
-  telegram("sendMessage", {
+    method: "POST",
 
-    chat_id: ADMIN_ID,
+    body: JSON.stringify(orderData)
 
-    text: message,
+  })
 
-    reply_markup:
-      JSON.stringify(keyboard)
+  .then(response => {
 
-  });
+    return response.json();
 
+  })
 
-  /* CUSTOMER CONFIRMATION */
+  .then(result => {
 
-  if (telegramId) {
+    if (result.success) {
 
-    telegram("sendMessage", {
+      tg.showAlert(
 
-      chat_id: telegramId,
-
-      text:
-
-        "🛒 ORDER CREATED!\n\n" +
+        "✅ ORDER CREATED!\n\n" +
 
         "📦 Order ID:\n" +
-        orderId +
+        result.orderId +
         "\n\n" +
 
         "🎮 Product:\n" +
-        (data.product || "-") +
+        product +
         "\n\n" +
 
         "💰 Price:\n" +
-        (data.price || "-") +
+        price +
         "\n\n" +
 
         "⏳ Status: PENDING\n\n" +
 
-        "👤 Admin: " +
-        ADMIN_USERNAME +
-        "\n\n" +
+        "👤 Admin will confirm your order."
 
-        "Please wait for admin confirmation."
-
-    });
-
-  }
-
-
-  return {
-
-    success: true,
-
-    orderId: orderId,
-
-    status: "PENDING"
-
-  };
-}
-
-
-/* ==================================================
-   UPDATE ORDER STATUS
-================================================== */
-
-function updateOrderStatus(orderId, newStatus) {
-
-  const sheet = getSheet();
-
-  const values =
-    sheet.getDataRange().getValues();
-
-
-  for (let i = 1; i < values.length; i++) {
-
-    if (
-      String(values[i][0]) ===
-      String(orderId)
-    ) {
-
-      const row = i + 1;
-
-
-      /*
-       * Status = Column J
-       */
-
-      sheet
-        .getRange(row, 10)
-        .setValue(newStatus);
-
-
-      /*
-       * Telegram ID = Column C
-       */
-
-      const telegramId =
-        String(values[i][2] || "");
-
-
-      /*
-       * Username = Column D
-       */
-
-      const username =
-        String(values[i][3] || "");
-
-
-      /*
-       * Product = Column E
-       */
-
-      const product =
-        String(values[i][4] || "");
-
-
-      let message = "";
-
-
-      /* APPROVED */
-
-      if (newStatus === "APPROVED") {
-
-        message =
-
-          "✅ ORDER APPROVED\n\n" +
-
-          "📦 " + orderId +
-          "\n\n" +
-
-          "🎮 " + product +
-          "\n\n" +
-
-          "Your order has been approved.\n" +
-
-          "⚙️ Your order will now be processed.\n\n" +
-
-          "👤 Admin: " +
-          ADMIN_USERNAME;
-
-      }
-
-
-      /* PROCESSING */
-
-      if (newStatus === "PROCESSING") {
-
-        message =
-
-          "⚙️ ORDER PROCESSING\n\n" +
-
-          "📦 " + orderId +
-          "\n\n" +
-
-          "🎮 " + product +
-          "\n\n" +
-
-          "Your order is being processed now.\n\n" +
-
-          "Please wait ❤️";
-
-      }
-
-
-      /* COMPLETED */
-
-      if (newStatus === "COMPLETED") {
-
-        message =
-
-          "🎉 ORDER COMPLETED\n\n" +
-
-          "📦 " + orderId +
-          "\n\n" +
-
-          "🎮 " + product +
-          "\n\n" +
-
-          "✅ Your order has been completed successfully.\n\n" +
-
-          "❤️ Thank you for shopping with CENTRAL SHOP!";
-
-      }
-
-
-      /* REJECTED */
-
-      if (newStatus === "REJECTED") {
-
-        message =
-
-          "❌ ORDER REJECTED\n\n" +
-
-          "📦 " + orderId +
-          "\n\n" +
-
-          "🎮 " + product +
-          "\n\n" +
-
-          "Your order has been rejected.\n\n" +
-
-          "👤 Admin: " +
-          ADMIN_USERNAME;
-
-      }
-
-
-      /* SEND TO CUSTOMER */
-
-      if (telegramId && message) {
-
-        telegram("sendMessage", {
-
-          chat_id: telegramId,
-
-          text: message
-
-        });
-
-      }
-
-
-      return true;
-    }
-  }
-
-
-  return false;
-}
-
-
-/* ==================================================
-   TELEGRAM WEBHOOK
-================================================== */
-
-function doPost(e) {
-
-  try {
-
-    const data =
-      JSON.parse(
-        e.postData.contents
       );
 
 
-    /* ==============================================
-       ADMIN BUTTON CLICK
-    ============================================== */
+      openPage("ordersPage");
 
-    if (data.callback_query) {
-
-      const callback =
-        data.callback_query;
+      showOrders();
 
 
-      const adminId =
-        String(callback.from.id);
+    } else {
 
+      tg.showAlert(
 
-      /*
-       * ADMIN ONLY
-       */
+        "❌ Order failed.\n\n" +
 
-      if (adminId !== ADMIN_ID) {
+        (result.error || "Unknown error")
 
-        telegram(
-          "answerCallbackQuery",
-          {
-
-            callback_query_id:
-              callback.id,
-
-            text:
-              "⛔ Admin only.",
-
-            show_alert: true
-
-          }
-        );
-
-        return ContentService
-          .createTextOutput("OK");
-      }
-
-
-      const parts =
-        String(callback.data)
-          .split("|");
-
-
-      const action =
-        parts[0];
-
-
-      const orderId =
-        parts[1];
-
-
-      let status = "";
-
-
-      if (action === "approve") {
-        status = "APPROVED";
-      }
-
-      if (action === "reject") {
-        status = "REJECTED";
-      }
-
-      if (action === "processing") {
-        status = "PROCESSING";
-      }
-
-      if (action === "completed") {
-        status = "COMPLETED";
-      }
-
-
-      if (status) {
-
-        updateOrderStatus(
-          orderId,
-          status
-        );
-
-      }
-
-
-      telegram(
-        "answerCallbackQuery",
-        {
-
-          callback_query_id:
-            callback.id,
-
-          text:
-            status
-              ? "Order → " + status
-              : "Unknown action"
-
-        }
       );
 
-
-      return ContentService
-        .createTextOutput("OK");
     }
 
+  })
 
-    /* ==============================================
-       CUSTOMER CREATE ORDER
-    ============================================== */
+  .catch(error => {
 
-    if (
-      data.action ===
-      "createOrder"
-    ) {
+    console.error(error);
 
-      const result =
-        createOrder(data);
+    tg.showAlert(
 
+      "❌ Connection error.\n\n" +
 
-      return ContentService
-        .createTextOutput(
-          JSON.stringify(result)
-        )
-        .setMimeType(
-          ContentService.MimeType.JSON
-        );
+      "Please try again."
+
+    );
+
+  })
+
+  .finally(() => {
+
+    if (button) {
+
+      button.disabled = false;
+
+      button.innerText =
+        "🛒 CONFIRM ORDER";
+
     }
 
+  });
 
-    return ContentService
-      .createTextOutput(
-        JSON.stringify({
-          success: false,
-          error: "Unknown action"
-        })
-      )
-      .setMimeType(
-        ContentService.MimeType.JSON
-      );
-
-  }
-
-
-  catch (error) {
-
-    return ContentService
-      .createTextOutput(
-        JSON.stringify({
-
-          success: false,
-
-          error:
-            error.toString()
-
-        })
-      )
-      .setMimeType(
-        ContentService.MimeType.JSON
-      );
-  }
-}
-
-
-/* ==================================================
-   SETUP GOOGLE SHEET
-================================================== */
-
-function setupSheet() {
-
-  const sheet = getSheet();
-
-  sheet.clear();
-
-  sheet.appendRow([
-
-    "Order ID",
-    "Time",
-    "Telegram ID",
-    "Username",
-    "Product",
-    "Price",
-    "Player ID",
-    "Server ID",
-    "Payment",
-    "Status"
-
-  ]);
-
-  Logger.log(
-    "✅ Google Sheet setup completed."
-  );
-}
-
-
-/* ==================================================
-   SET TELEGRAM WEBHOOK
-================================================== */
-
-function setWebhook() {
-
-  const webAppUrl =
-    ScriptApp
-      .getService()
-      .getUrl();
-
-
-  if (!webAppUrl) {
-
-    throw new Error(
-      "Web App URL not found. Deploy the project as Web App first."
-    );
-
-  }
-
-
-  const result =
-    telegram(
-      "setWebhook",
-      {
-        url: webAppUrl
-      }
-    );
-
-
-  Logger.log(result);
-}
-
-
-/* ==================================================
-   CHECK WEBHOOK
-================================================== */
-
-function checkWebhook() {
-
-  const result =
-    telegram(
-      "getWebhookInfo",
-      {}
-    );
-
-
-  Logger.log(result);
 }
